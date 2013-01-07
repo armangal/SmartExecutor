@@ -1,147 +1,147 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-    <modelVersion>1.0.0</modelVersion>
-    <groupId>com.armangal</groupId>
-    <artifactId>smartexecutor</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
-    <packaging>jar</packaging>
-    <name>smartexecutor</name>
-    <description>
-SmartExecutor is a light-weight thread execution framework. 
-The goal of the framework is to provide easy controllable thread executions.
-
+	<modelVersion>1.0.0</modelVersion>
+	<groupId>org.smexec</groupId>
+	<artifactId>smartexecutor</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+	<packaging>jar</packaging>
+	<name>smartexecutor</name>
+	<description>
+		SmartExecutor is a light-weight thread execution framework. 
+		The goal of the framework is to provide easy controllable thread executions.
     </description>
 
-    <url>https://github.com/armangal/SmartExecutor</url>
-    <licenses>
-        <license>
-            <name>MIT license</name>
-            <url>http://www.opensource.org/licenses/mit-license.php</url>
-        </license>
-    </licenses>
-    <scm>
-        <url>scm:git:git@github.com:armangal/SmartExecutor.git</url>
-        <connection>scm:git:git@github.com:armangal/SmartExecutor.git</connection>
-      <tag>HEAD</tag>
-  </scm>
-    <developers>
+	<url>https://github.com/armangal/SmartExecutor</url>
+	<licenses>
+		<license>
+			<name>MIT license</name>
+			<url>http://www.opensource.org/licenses/mit-license.php</url>
+		</license>
+	</licenses>
+	<scm>
+		<url>scm:git:git@github.com:armangal/SmartExecutor.git</url>
+		<connection>scm:git:git@github.com:armangal/SmartExecutor.git</connection>
+		<tag>HEAD</tag>
+	</scm>
+	<developers>
 
-        <developer>
-            <id>armangal</id>
-            <name>Arman Gal</name>
-            <timezone>+3</timezone>
-        </developer>
-    </developers>
+		<developer>
+			<id>armangal</id>
+			<name>Arman Gal</name>
+			<timezone>+3</timezone>
+		</developer>
+	</developers>
 
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.build.java.version>1.6</project.build.java.version>
-        <github.url>file://${project.basedir}/mvn-local-repo</github.url>
-    </properties>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.build.java.version>1.6</project.build.java.version>
+		<github.url>file://${project.basedir}/mvn-local-repo</github.url>
+	</properties>
 
-    <dependencies>
+	<dependencies>
 
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.10</version>
-            <scope>test</scope>
-        </dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.10</version>
+			<scope>test</scope>
+		</dependency>
 
-    </dependencies>
+	</dependencies>
 
-    <distributionManagement>
-        <repository>
-            <id>SmartExecutor-github-repo</id>
-            <url>${github.url}</url>
-        </repository>
-    </distributionManagement>
+	<distributionManagement>
+		<repository>
+			<id>smartexecutor-github-repo</id>
+			<url>${github.url}</url>
+		</repository>
+	</distributionManagement>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>${project.build.java.version}</source>
-                    <target>${project.build.java.version}</target>
-                </configuration>
-            </plugin>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>${project.build.java.version}</source>
+					<target>${project.build.java.version}</target>
+				</configuration>
+			</plugin>
 
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-release-plugin</artifactId>
-                <version>2.4</version>
-                <configuration>
-                    <mavenExecutorId>forked-path</mavenExecutorId>
-                </configuration>
-            </plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-release-plugin</artifactId>
+				<version>2.4</version>
+				<configuration>
+					<mavenExecutorId>forked-path</mavenExecutorId>
+				</configuration>
+			</plugin>
 
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <skipTests>false</skipTests>
-                </configuration>
-            </plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<skipTests>false</skipTests>
+				</configuration>
+			</plugin>
 
-            <!-- bind the source attaching to package phase -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>attach-sources</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
+			<!-- bind the source attaching to package phase -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>attach-javadocs</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>attach-javadocs</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 
-        </plugins>
-    </build>
+		</plugins>
+	</build>
 
-    <profiles>
-        <profile>
-            <id>release-sign-artifacts</id>
-            <activation>
-                <property>
-                    <name>performRelease</name>
-                    <value>true</value>
-                </property>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-gpg-plugin</artifactId>
-                        <version>1.4</version>
-                        <executions>
-                            <execution>
-                                <id>sign-artifacts</id>
-                                <phase>verify</phase>
-                                <goals>
-                                    <goal>sign</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
+	<profiles>
+		<profile>
+			<id>release-sign-artifacts</id>
+			<activation>
+				<property>
+					<name>performRelease</name>
+					<value>true</value>
+				</property>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-gpg-plugin</artifactId>
+						<version>1.4</version>
+						<executions>
+							<execution>
+								<id>sign-artifacts</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 </project>
