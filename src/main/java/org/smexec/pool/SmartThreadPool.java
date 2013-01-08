@@ -15,22 +15,54 @@
 package org.smexec.pool;
 
 import java.util.Properties;
-import java.util.Queue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.smexec.SmartExecutorProperty;
+import org.smexec.SmartProperties;
+import org.smexec.SmartRunnble;
 
 public class SmartThreadPool {
 
     private ThreadPoolExecutor pool;
 
     public SmartThreadPool(final String poolName, final Properties properties) {
-        SmartExecutorProperty<Integer> corePoolSize =  SmartExecutorProperty.Factory.asProperty(properties.getProperty("", "2"));
-        Queue workQueue;
-        
+        SmartExecutorProperty<Integer> corePoolSize = SmartExecutorProperty.Factory.asProperty(Integer.valueOf(properties.getProperty(poolName
+                                                                                                                                                      + "."
+                                                                                                                                                      + SmartProperties.POOL_SIZE.getName(),
+                                                                                                                                      SmartProperties.POOL_SIZE.getDefaultValue())));
+
+        SmartExecutorProperty<Integer> maximumPoolSize = SmartExecutorProperty.Factory.asProperty(Integer.valueOf(properties.getProperty(poolName
+                                                                                                                                                         + "."
+                                                                                                                                                         + SmartProperties.MAX_POOL_SIZE.getName(),
+                                                                                                                                         SmartProperties.MAX_POOL_SIZE.getDefaultValue())));
+
+        SmartExecutorProperty<Integer> keepAliveTime = SmartExecutorProperty.Factory.asProperty(Integer.valueOf(properties.getProperty(poolName
+                                                                                                                                                       + "."
+                                                                                                                                                       + SmartProperties.KEEP_ALIVE_TIME.getName(),
+                                                                                                                                       SmartProperties.KEEP_ALIVE_TIME.getDefaultValue())));
+
+        SmartExecutorProperty<Integer> queueSize = SmartExecutorProperty.Factory.asProperty(Integer.valueOf(properties.getProperty(poolName
+                                                                                                                                                   + "."
+                                                                                                                                                   + SmartProperties.QUEUE_SIZE.getName(),
+                                                                                                                                   SmartProperties.QUEUE_SIZE.getDefaultValue())));
+
+        BlockingQueue<Runnable> workQueue;
+
+        if (queueSize.get() == -1) {
+            workQueue = new SynchronousQueue<Runnable>();
+        } else {
+            workQueue = new LinkedBlockingQueue<Runnable>(queueSize.get());
+
+        }
+
         pool = new ThreadPoolExecutor(corePoolSize.get(), maximumPoolSize.get(), keepAliveTime.get(), TimeUnit.MILLISECONDS, workQueue, new ThreadFactory() {
 
             protected final AtomicInteger threadNumber = new AtomicInteger(0);
@@ -40,5 +72,15 @@ public class SmartThreadPool {
                 return new Thread(r, "SE-" + poolName + "-" + threadNumber.incrementAndGet());
             }
         });
+        
+        
+    }
+    
+    public void execute(SmartRunnble command) {
+        pool.execute(command);
+    }
+    
+    public <T> Future<T> submit(Callable<T> task) {
+        return pool.submit(task);
     }
 }

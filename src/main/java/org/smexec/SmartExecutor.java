@@ -17,9 +17,7 @@ package org.smexec;
 import java.util.Properties;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,23 +41,27 @@ public class SmartExecutor {
         logger.info("Initilized SmartExecutor with properties:{}", smartExecutorProperties);
     }
 
-    public void execute(Runnable command, String poolName) {
-        SmartThreadPool smartThreadPool = getPool(defaultPoolName);
+    public void execute(Runnable command, String poolName, String threadNameSuffix) {
+        SmartThreadPool smartThreadPool = getPool(poolName);
+        SmartRunnble sr = new SmartRunnble(command, threadNameSuffix);
+        smartThreadPool.execute(sr);
+    }
 
+    public void execute(Runnable command, String poolName) {
+        execute(command, poolName, null);
     }
 
     public void execute(Runnable command) {
-        execute(command, defaultPoolName);
+        execute(command, defaultPoolName, null);
     }
 
-    public <T> Future<T> submit(Runnable task, T result) {
-
-        Callable<T> callable = Executors.callable(task, result);
-
+    public <T> Future<T> submit(Callable<T> task, String poolName) {
+        SmartThreadPool smartThreadPool = getPool(poolName);
+        return smartThreadPool.submit(task);
     }
 
     public <T> Future<T> submit(Callable<T> task) {
-        return schedule(task, 0, TimeUnit.NANOSECONDS);
+        return submit(task, defaultPoolName);
     }
 
     public void shutdown() {
@@ -83,6 +85,6 @@ public class SmartExecutor {
     }
 
     private SmartThreadPool initThreadPool(String poolName) {
-        return new SmartThreadPool();
+        return new SmartThreadPool(poolName, smartExecutorProperties);
     }
 }
