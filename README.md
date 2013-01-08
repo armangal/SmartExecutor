@@ -1,5 +1,6 @@
-SmartExecutor
-=========
+<h1>SmartExecutor</h1>
+<i>The framework is still under development, more documentation will be available soon.</i>
+----
 
 SmartExecutor is a light-weight thread execution framework. 
 The goal of the framework is to provide easy controllable threads executions.
@@ -12,8 +13,8 @@ The goal of the framework is to provide easy controllable threads executions.
 <h2 name="features">Features</h2>
 - Configurable Thread Pools
 - Pre/Pos Execution Hooks
-- 
-The framework is still under development, more documentation will be available soon.
+
+
 
 
 
