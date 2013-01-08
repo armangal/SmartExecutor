@@ -19,12 +19,15 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.smexec.SmartCallble;
 import org.smexec.SmartExecutorProperty;
 import org.smexec.SmartProperties;
-import org.smexec.SmartRunnble;
+import org.smexec.SmartRunnable;
 
 public class SmartScheduledThreadPool
     implements ISmartScheduledThreadPool {
@@ -48,27 +51,37 @@ public class SmartScheduledThreadPool
                 return new Thread(r, "SES_" + poolName + "-" + threadNumber.incrementAndGet());
             }
         });
-        
-        pool.schedule(callable, delay, unit)
 
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.smexec.pool.ISmartThreadPool#execute(org.smexec.SmartRunnble)
-     */
     @Override
-    public void execute(SmartRunnble command) {
+    public void execute(SmartRunnable command) {
         pool.execute(command);
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.smexec.pool.ISmartThreadPool#submit(java.util.concurrent.Callable)
-     */
     @Override
     public <T> Future<T> submit(Callable<T> task) {
         return pool.submit(task);
+    }
+
+    @Override
+    public ScheduledFuture<?> schedule(SmartRunnable command, long delay, TimeUnit unit) {
+        return pool.schedule(command, delay, unit);
+    }
+
+    @Override
+    public <V> ScheduledFuture<V> schedule(SmartCallble<V> callable, long delay, TimeUnit unit) {
+        return pool.schedule(callable, delay, unit);
+    }
+
+    @Override
+    public ScheduledFuture<?> scheduleAtFixedRate(SmartRunnable command, long initialDelay, long period, TimeUnit unit) {
+        return pool.scheduleAtFixedRate(command, initialDelay, period, unit);
+    }
+
+    @Override
+    public ScheduledFuture<?> scheduleWithFixedDelay(SmartRunnable command, long initialDelay, long delay, TimeUnit unit) {
+        return pool.scheduleWithFixedDelay(command, initialDelay, delay, unit);
     }
 
 }

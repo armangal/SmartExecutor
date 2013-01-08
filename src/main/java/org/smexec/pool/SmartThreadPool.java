@@ -27,7 +27,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.smexec.SmartExecutorProperty;
 import org.smexec.SmartProperties;
-import org.smexec.SmartRunnble;
+import org.smexec.SmartRunnable;
 
 public class SmartThreadPool
     implements ISmartThreadPool {
@@ -77,7 +77,7 @@ public class SmartThreadPool
 
     }
 
-    public void execute(SmartRunnble command) {
+    public void execute(SmartRunnable command) {
         pool.execute(command);
     }
 
