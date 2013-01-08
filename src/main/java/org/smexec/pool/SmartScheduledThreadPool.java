@@ -48,6 +48,8 @@ public class SmartScheduledThreadPool
                 return new Thread(r, "SES_" + poolName + "-" + threadNumber.incrementAndGet());
             }
         });
+        
+        pool.schedule(callable, delay, unit)
 
     }
 

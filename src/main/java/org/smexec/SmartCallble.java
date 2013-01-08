@@ -1,30 +1,34 @@
 package org.smexec;
 
+import java.util.concurrent.Callable;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A wrapper Runnble for internal usage. <br>
+ * A wrapper Callable for internal usage. <br>
  * I allows us to better control the thread execution, hooks and thread naming.
  */
-public class SmartRunnble
-    implements Runnable {
+public class SmartCallble<V>
+    implements Callable<V> {
 
-    private static Logger logger = LoggerFactory.getLogger(SmartRunnble.class);
-    private Runnable runnable;
+    private static Logger logger = LoggerFactory.getLogger(SmartCallble.class);
+
+    private Callable<V> callable;
     private String threadNameSuffix;
 
-    public SmartRunnble(Runnable runnable, String threadNameSuffix) {
-        this.runnable = runnable;
+    public SmartCallble(Callable<V> callable, String threadNameSuffix) {
+        this.callable = callable;
         this.threadNameSuffix = threadNameSuffix;
     }
 
-    public SmartRunnble(Runnable runnable) {
-        this.runnable = runnable;
+    public SmartCallble(Callable<V> callable) {
+        this.callable = callable;
     }
 
     @Override
-    public void run() {
+    public V call()
+        throws Exception {
         String orgName = null;
         try {
             if (threadNameSuffix != null) {
@@ -33,13 +37,15 @@ public class SmartRunnble
             }
             // TODO Pre execution HOOK
 
-            runnable.run();
+            V ret = callable.call();
 
             // TODO Post execution HOOK
 
+            return ret;
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-
+            throw e;
+            
         } finally {
             if (orgName != null) {
                 Thread.currentThread().setName(orgName);
