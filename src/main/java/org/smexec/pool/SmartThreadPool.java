@@ -33,10 +33,10 @@ public class SmartThreadPool
     private ThreadPoolExecutor pool;
 
     private PoolConfiguration poolConfiguration;
-    
+
     public SmartThreadPool(final PoolConfiguration poolConfiguration) {
         this.poolConfiguration = poolConfiguration;
-        
+
         BlockingQueue<Runnable> workQueue;
 
         if (poolConfiguration.getQueueSize() == -1) {
@@ -46,16 +46,21 @@ public class SmartThreadPool
 
         }
 
-        pool = new ThreadPoolExecutor(poolConfiguration.getCorePollSize(), poolConfiguration.getMaxPoolSize(), poolConfiguration.getKeepAliveTime(), TimeUnit.MILLISECONDS, workQueue, new ThreadFactory() {
+        pool = new ThreadPoolExecutor(poolConfiguration.getCorePollSize(),
+                                      poolConfiguration.getMaxPoolSize(),
+                                      poolConfiguration.getKeepAliveTime(),
+                                      TimeUnit.MILLISECONDS,
+                                      workQueue,
+                                      new ThreadFactory() {
 
-            protected final AtomicInteger threadNumber = new AtomicInteger(0);
+                                          protected final AtomicInteger threadNumber = new AtomicInteger(0);
 
-            @Override
-            public Thread newThread(Runnable r) {
-                // SER means SmartExecutorRegular pool
-                return new Thread(r, "SER_" + poolConfiguration.getPoolNameShort() + "_" + threadNumber.incrementAndGet());
-            }
-        });
+                                          @Override
+                                          public Thread newThread(Runnable r) {
+                                              // SER means SmartExecutorRegular pool
+                                              return new Thread(r, "SER_" + poolConfiguration.getPoolNameShort() + "_" + threadNumber.incrementAndGet());
+                                          }
+                                      });
 
     }
 
@@ -66,9 +71,14 @@ public class SmartThreadPool
     public <T> Future<T> submit(SmartCallable<T> task) {
         return pool.submit(task);
     }
-    
+
     @Override
     public void shutdown() {
         pool.shutdown();
+    }
+
+    @Override
+    public String toString() {
+        return "SmartThreadPool [" + poolConfiguration + "]";
     }
 }

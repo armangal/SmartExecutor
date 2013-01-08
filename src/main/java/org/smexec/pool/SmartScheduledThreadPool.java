@@ -83,4 +83,9 @@ public class SmartScheduledThreadPool
         pool.shutdown();
     }
 
+    @Override
+    public String toString() {
+        return "SmartScheduledThreadPool [" + poolConfiguration + "]";
+    }
+
 }
