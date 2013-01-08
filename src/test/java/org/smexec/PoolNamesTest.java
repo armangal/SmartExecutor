@@ -3,5 +3,8 @@ package org.smexec;
 
 public class PoolNamesTest {
 
-    public final static String POOL_TST1 = "TST1";
+    public final static String DEFAULT_POOL = "Default";
+    public final static String SCHEDULED_POOL = "Scheduled";
+    
+    
 }

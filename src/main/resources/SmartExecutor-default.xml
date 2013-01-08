@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<SmartExecutor xmlns:ns2="http://www.armangal.com/smartexecutor/v1">
+
+	<pools>
+		<pool>
+			<poolName>Default</poolName>
+			<poolNameShort>DTP</poolNameShort>
+			<corePollSize>2</corePollSize>
+			<maxPoolSize>3</maxPoolSize>
+			<queueSize>100</queueSize>
+			<keepAliveTime>1000</keepAliveTime>
+			<poolType>regular</poolType>
+		</pool>
+		<pool>
+			<poolName>Scheduled</poolName>
+			<poolNameShort>STP1</poolNameShort>
+			<corePollSize>5</corePollSize>
+			<poolType>scheduled</poolType>
+		</pool>
+	</pools>
+</SmartExecutor>

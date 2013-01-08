@@ -2,28 +2,37 @@ package org.smexec;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Properties;
+import java.util.concurrent.TimeUnit;
+
+import javax.xml.bind.JAXBException;
 
 public class SmartExecutorTest {
 
     public static void main(String[] args)
-        throws IOException {
-        InputStream propStrem = Thread.currentThread().getContextClassLoader().getResourceAsStream("smartExecutor.properties");
+        throws IOException, JAXBException {
 
-        Properties properties = new Properties();
-        properties.load(propStrem);
-        System.out.println(properties);
-
-        SmartExecutor se = new SmartExecutor(properties);
+        InputStream resourceAsStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("SmartExecutor-test.xml");
         
+        SmartExecutor se = new SmartExecutor("SmartExecutor-test.xml");
+
         Runnable command = new Runnable() {
-            
+
             @Override
             public void run() {
                 System.out.println("Run1:" + Thread.currentThread().getName());
             }
         };
-        
-        se.execute(command, PoolNamesTest.POOL_TST1);
+
+        se.execute(command, PoolNamesTest.DEFAULT_POOL);
+
+        se.execute(command, PoolNamesTest.DEFAULT_POOL, "XXX");
+
+        se.execute(command, "Custom1");
+
+        se.execute(command, "Custom1", "CCC");
+
+        se.scheduleAtFixedRate(command, 1000l, 1000l, TimeUnit.MILLISECONDS, PoolNamesTest.SCHEDULED_POOL, "EverySecond");
+
+        se.scheduleAtFixedRate(command, 1000l, 1000l, TimeUnit.MILLISECONDS, "Scheduled2", "EverySecond");
     }
 }

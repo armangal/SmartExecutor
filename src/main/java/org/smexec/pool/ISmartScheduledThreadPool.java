@@ -3,7 +3,7 @@ package org.smexec.pool;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-import org.smexec.SmartCallble;
+import org.smexec.SmartCallable;
 import org.smexec.SmartRunnable;
 
 public interface ISmartScheduledThreadPool
@@ -11,7 +11,7 @@ public interface ISmartScheduledThreadPool
 
     ScheduledFuture<?> schedule(SmartRunnable command, long delay, TimeUnit unit);
 
-    <V> ScheduledFuture<V> schedule(SmartCallble<V> callable, long delay, TimeUnit unit);
+    <V> ScheduledFuture<V> schedule(SmartCallable<V> callable, long delay, TimeUnit unit);
 
     ScheduledFuture<?> scheduleAtFixedRate(SmartRunnable command, long initialDelay, long period, TimeUnit unit);
 

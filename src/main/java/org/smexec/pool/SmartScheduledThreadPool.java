@@ -14,8 +14,6 @@
  */
 package org.smexec.pool;
 
-import java.util.Properties;
-import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
@@ -24,31 +22,27 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.smexec.SmartCallble;
-import org.smexec.SmartExecutorProperty;
-import org.smexec.SmartProperties;
+import org.smexec.SmartCallable;
 import org.smexec.SmartRunnable;
+import org.smexec.configuration.PoolConfiguration;
 
 public class SmartScheduledThreadPool
     implements ISmartScheduledThreadPool {
 
     private ScheduledExecutorService pool;
 
-    public SmartScheduledThreadPool(final String poolName, final Properties properties) {
+    private PoolConfiguration poolConfiguration;
 
-        SmartExecutorProperty<Integer> corePoolSize = SmartExecutorProperty.Factory.asProperty(Integer.valueOf(properties.getProperty(poolName
-                                                                                                                                                      + "."
-                                                                                                                                                      + SmartProperties.POOL_SIZE.getName(),
-                                                                                                                                      SmartProperties.POOL_SIZE.getDefaultValue())));
+    public SmartScheduledThreadPool(final PoolConfiguration poolConfiguration) {
 
-        pool = Executors.newScheduledThreadPool(corePoolSize.get(), new ThreadFactory() {
+        pool = Executors.newScheduledThreadPool(poolConfiguration.getCorePollSize(), new ThreadFactory() {
 
             protected final AtomicInteger threadNumber = new AtomicInteger(0);
 
             @Override
             public Thread newThread(Runnable r) {
                 // SESR means SmartExecutorScheduled pool
-                return new Thread(r, "SES_" + poolName + "-" + threadNumber.incrementAndGet());
+                return new Thread(r, "SES_" + poolConfiguration.getPoolNameShort() + "_" + threadNumber.incrementAndGet());
             }
         });
 
@@ -60,7 +54,7 @@ public class SmartScheduledThreadPool
     }
 
     @Override
-    public <T> Future<T> submit(Callable<T> task) {
+    public <T> Future<T> submit(SmartCallable<T> task) {
         return pool.submit(task);
     }
 
@@ -70,7 +64,7 @@ public class SmartScheduledThreadPool
     }
 
     @Override
-    public <V> ScheduledFuture<V> schedule(SmartCallble<V> callable, long delay, TimeUnit unit) {
+    public <V> ScheduledFuture<V> schedule(SmartCallable<V> callable, long delay, TimeUnit unit) {
         return pool.schedule(callable, delay, unit);
     }
 

@@ -1,0 +1,27 @@
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	<xs:element name="SmartExecutor">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="pools">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="pool" maxOccurs="unbounded" minOccurs="1">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element type="xs:string" name="poolName" minOccurs="1"/>
+										<xs:element type="xs:string" name="poolNameShort" minOccurs="1"/>
+										<xs:element type="xs:byte" name="corePollSize" minOccurs="1"/>
+										<xs:element type="xs:byte" name="maxPoolSize" minOccurs="0" />
+										<xs:element type="xs:byte" name="queueSize" minOccurs="0" />
+										<xs:element type="xs:short" name="keepAliveTime" minOccurs="0" />
+										<xs:element type="xs:string" name="poolType" minOccurs="1" />
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>
