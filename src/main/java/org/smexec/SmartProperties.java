@@ -1,6 +1,7 @@
 package org.smexec;
 
 public enum SmartProperties {
+    POOL_TYPE("poolType", "regular"),
     POOL_NAME("poolName", "Default"),
     POOL_SIZE("poolSize", "2"),
     MAX_POOL_SIZE("maxPoolSize", "2"),
