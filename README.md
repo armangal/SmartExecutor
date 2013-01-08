@@ -17,7 +17,7 @@ The framework is still under development, more documentation will be available s
 
 
 
-===========================================================================================================================================================
+----
 MIT License
 
 Copyright (c) 2013 Arman Gal
