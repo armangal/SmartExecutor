@@ -14,13 +14,24 @@
  */
 package org.smexec;
 
-import java.util.Properties;
+import java.io.InputStream;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.smexec.configuration.Config;
+import org.smexec.configuration.PoolConfiguration;
+import org.smexec.configuration.PoolType;
+import org.smexec.pool.ISmartScheduledThreadPool;
+import org.smexec.pool.ISmartThreadPool;
+import org.smexec.pool.SmartScheduledThreadPool;
 import org.smexec.pool.SmartThreadPool;
 
 /**
@@ -30,19 +41,34 @@ public class SmartExecutor {
 
     private static Logger logger = LoggerFactory.getLogger("SE");
 
-    private ConcurrentHashMap<String, SmartThreadPool> threadPoolMap = new ConcurrentHashMap<String, SmartThreadPool>(0);
+    private static final String defaultXMLConfName = "SmartExecutor-default.xml";
+    private static final String defaultPoolName = "Default";
+    private static final String defaultScheduledPoolName = "Scheduled";
 
-    private String defaultPoolName;
+    private ConcurrentHashMap<String, ISmartThreadPool> threadPoolMap = new ConcurrentHashMap<String, ISmartThreadPool>(0);
 
-    private Properties smartExecutorProperties;
 
-    public SmartExecutor(Properties smartExecutorProperties) {
-        this.smartExecutorProperties = smartExecutorProperties;
-        logger.info("Initilized SmartExecutor with properties:{}", smartExecutorProperties);
+    private Config config;
+
+    public SmartExecutor()
+        throws JAXBException {
+        this(defaultXMLConfName);
+    }
+
+    public SmartExecutor(String configXMLresource)
+        throws JAXBException {
+        InputStream configXML = Thread.currentThread().getContextClassLoader().getResourceAsStream(configXMLresource);
+        if (configXML == null) {
+            throw new RuntimeException("Configuration file wan't found:" + configXMLresource);
+        }
+        JAXBContext context = JAXBContext.newInstance(Config.class);
+        config = (Config) context.createUnmarshaller().unmarshal(configXML);
+
+        logger.info("Initilized SmartExecutor with properties:{}", config);
     }
 
     public void execute(Runnable command, String poolName, String threadNameSuffix) {
-        SmartThreadPool smartThreadPool = getPool(poolName);
+        ISmartThreadPool smartThreadPool = getPool(poolName);
         SmartRunnable sr = new SmartRunnable(command, threadNameSuffix);
         smartThreadPool.execute(sr);
     }
@@ -56,19 +82,52 @@ public class SmartExecutor {
     }
 
     public <T> Future<T> submit(Callable<T> task, String poolName) {
-        SmartThreadPool smartThreadPool = getPool(poolName);
-        return smartThreadPool.submit(task);
+        ISmartThreadPool smartThreadPool = getPool(poolName);
+        SmartCallable<T> sc = new SmartCallable<T>(task, null);
+        return smartThreadPool.submit(sc);
     }
 
     public <T> Future<T> submit(Callable<T> task) {
         return submit(task, defaultPoolName);
     }
 
+    public ScheduledFuture<?> schedule(Runnable command, long delay, TimeUnit unit, String poolName, String threadName) {
+        ISmartScheduledThreadPool scheduledPool = getScheduledPool(poolName);
+        SmartRunnable sr = new SmartRunnable(command, threadName);
+        return scheduledPool.schedule(sr, delay, unit);
+    }
+
+    public <V> ScheduledFuture<V> schedule(Callable<V> callable, long delay, TimeUnit unit, String poolName, String threadName) {
+        ISmartScheduledThreadPool scheduledPool = getScheduledPool(poolName);
+        SmartCallable<V> sc = new SmartCallable<V>(callable, threadName);
+        return scheduledPool.schedule(sc, delay, unit);
+    }
+
+    public ScheduledFuture<?> scheduleAtFixedRate(Runnable command, long initialDelay, long period, TimeUnit unit, String poolName, String threadName) {
+        ISmartScheduledThreadPool scheduledPool = getScheduledPool(poolName);
+        SmartRunnable sr = new SmartRunnable(command, threadName);
+        return scheduledPool.scheduleAtFixedRate(sr, initialDelay, period, unit);
+    }
+
+    public ScheduledFuture<?> scheduleWithFixedDelay(Runnable command, long initialDelay, long delay, TimeUnit unit, String poolName, String threadName) {
+        ISmartScheduledThreadPool scheduledPool = getScheduledPool(poolName);
+        SmartRunnable sr = new SmartRunnable(command, threadName);
+        return scheduledPool.scheduleWithFixedDelay(sr, initialDelay, delay, unit);
+    }
+
     public void shutdown() {
 
     }
 
-    private SmartThreadPool getPool(String poolName) {
+    private ISmartScheduledThreadPool getScheduledPool(String poolName) {
+        ISmartThreadPool pool = getPool(poolName);
+        if (pool instanceof ISmartScheduledThreadPool) {
+            return (ISmartScheduledThreadPool) pool;
+        }
+        throw new RuntimeException("Pool:" + poolName + " not found.");
+    }
+
+    private ISmartThreadPool getPool(String poolName) {
         if (threadPoolMap.contains(poolName)) {
             return threadPoolMap.get(poolName);
         } else {
@@ -76,7 +135,7 @@ public class SmartExecutor {
                 if (threadPoolMap.contains(poolName)) {
                     return threadPoolMap.get(poolName);
                 } else {
-                    SmartThreadPool threadPool = initThreadPool(poolName);
+                    ISmartThreadPool threadPool = initThreadPool(poolName);
                     threadPoolMap.put(poolName, threadPool);
                     return threadPool;
                 }
@@ -84,7 +143,15 @@ public class SmartExecutor {
         }
     }
 
-    private SmartThreadPool initThreadPool(String poolName) {
-        return new SmartThreadPool(poolName, smartExecutorProperties);
+    private ISmartThreadPool initThreadPool(String poolName) {
+        PoolConfiguration poolConfiguration = config.getPoolConfiguration(poolName);
+        if (poolConfiguration != null) {
+            if (poolConfiguration.getPoolType().equals(PoolType.regular)) {
+                return new SmartThreadPool(poolConfiguration);
+            } else {
+                return new SmartScheduledThreadPool(poolConfiguration);
+            }
+        }
+        throw new RuntimeException("Configaration for pool:" + poolName + " were not found.");
     }
 }
