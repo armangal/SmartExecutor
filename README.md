@@ -1,4 +1,4 @@
-<h1>SmartExecutor</h1>
+<h1>Smart Executor</h1>
 <i>The framework is still under development, more documentation will be available soon.</i>
 ----
 
