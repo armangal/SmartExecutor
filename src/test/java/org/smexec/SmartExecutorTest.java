@@ -11,8 +11,6 @@ public class SmartExecutorTest {
     public static void main(String[] args)
         throws IOException, JAXBException {
 
-        InputStream resourceAsStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("SmartExecutor-test.xml");
-        
         SmartExecutor se = new SmartExecutor("SmartExecutor-test.xml");
 
         Runnable command = new Runnable() {
