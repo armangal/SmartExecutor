@@ -29,7 +29,8 @@ import org.smexec.SmartExecutorProperty;
 import org.smexec.SmartProperties;
 import org.smexec.SmartRunnble;
 
-public class SmartThreadPool {
+public class SmartThreadPool
+    implements ISmartThreadPool {
 
     private ThreadPoolExecutor pool;
 
@@ -69,17 +70,17 @@ public class SmartThreadPool {
 
             @Override
             public Thread newThread(Runnable r) {
-                return new Thread(r, "SE-" + poolName + "-" + threadNumber.incrementAndGet());
+                // SER means SmartExecutorRegular pool
+                return new Thread(r, "SER_" + poolName + "-" + threadNumber.incrementAndGet());
             }
         });
-        
-        
+
     }
-    
+
     public void execute(SmartRunnble command) {
         pool.execute(command);
     }
-    
+
     public <T> Future<T> submit(Callable<T> task) {
         return pool.submit(task);
     }
