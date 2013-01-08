@@ -47,7 +47,6 @@ public class SmartExecutor {
 
     private ConcurrentHashMap<String, ISmartThreadPool> threadPoolMap = new ConcurrentHashMap<String, ISmartThreadPool>(0);
 
-
     private Config config;
 
     public SmartExecutor()
@@ -57,6 +56,7 @@ public class SmartExecutor {
 
     public SmartExecutor(String configXMLresource)
         throws JAXBException {
+        // TODO improve configuration loading API
         InputStream configXML = Thread.currentThread().getContextClassLoader().getResourceAsStream(configXMLresource);
         if (configXML == null) {
             throw new RuntimeException("Configuration file wan't found:" + configXMLresource);
@@ -116,6 +116,10 @@ public class SmartExecutor {
     }
 
     public void shutdown() {
+        for (ISmartThreadPool smartThreadPool : threadPoolMap.values()) {
+            logger.info("Shoting down pool:{}", smartThreadPool);
+            smartThreadPool.shutdown();
+        }
 
     }
 
