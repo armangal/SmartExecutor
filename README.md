@@ -5,8 +5,8 @@ SmartExecutor is a light-weight thread execution framework.
 The goal of the framework is to provide easy controllable threads executions.
 
 <h2>Motivation</h2>
-Developers tend to create countles Executors ("Wild Executors") or Threads/Timers ("Wild Threads") all over the application witout proper configurations and documentations. Later we find ourselfs reviewing thread dumps where thread names means nothing to us and their amount is not consistent.
-We want to distignue where logical features are executed in order to get better contorl over application, for example we have important (I) operations and non-important (NI), when we use one thread pool to execute those operations, delayes in execution of NI operations will cause I operations to be delayed us well and even rejected by the thread pool.
+- Developers tend to create countles Executors ("Wild Executors") or Threads/Timers ("Wild Threads") all over the application witout proper configurations and documentations. Later we find ourselfs reviewing thread dumps where thread names means nothing to us and their amount is not consistent.
+- We want to distignue where logical features are executed in order to get better contorl over application life-cylce, for example we have important (I) operations and less-important (LI), when we use one thread pool to execute those operations togather, delayes in execution of LI operations will cause I operations to be delayed us well and even rejected by the thread pool when queue becomes full.
 
 
 <h2 name="features">Features</h2>
