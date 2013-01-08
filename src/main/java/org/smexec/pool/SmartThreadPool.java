@@ -66,4 +66,9 @@ public class SmartThreadPool
     public <T> Future<T> submit(SmartCallable<T> task) {
         return pool.submit(task);
     }
+    
+    @Override
+    public void shutdown() {
+        pool.shutdown();
+    }
 }

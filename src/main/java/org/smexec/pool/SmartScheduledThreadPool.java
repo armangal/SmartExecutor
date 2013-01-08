@@ -78,4 +78,9 @@ public class SmartScheduledThreadPool
         return pool.scheduleWithFixedDelay(command, initialDelay, delay, unit);
     }
 
+    @Override
+    public void shutdown() {
+        pool.shutdown();
+    }
+
 }
