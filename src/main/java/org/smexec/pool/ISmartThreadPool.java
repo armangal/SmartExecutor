@@ -10,5 +10,7 @@ public interface ISmartThreadPool {
     void execute(SmartRunnable command);
 
     <T> Future<T> submit(SmartCallable<T> task);
+    
+    void shutdown();
 
 }
