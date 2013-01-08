@@ -43,7 +43,7 @@ public class SmartExecutor {
 
     public void execute(Runnable command, String poolName, String threadNameSuffix) {
         SmartThreadPool smartThreadPool = getPool(poolName);
-        SmartRunnble sr = new SmartRunnble(command, threadNameSuffix);
+        SmartRunnable sr = new SmartRunnable(command, threadNameSuffix);
         smartThreadPool.execute(sr);
     }
 
