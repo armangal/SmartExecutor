@@ -32,5 +32,7 @@ public class SmartExecutorTest {
         se.scheduleAtFixedRate(command, 1000l, 1000l, TimeUnit.MILLISECONDS, PoolNamesTest.SCHEDULED_POOL, "EverySecond");
 
         se.scheduleAtFixedRate(command, 1000l, 1000l, TimeUnit.MILLISECONDS, "Scheduled2", "EverySecond");
+        
+        System.out.println(se);
     }
 }

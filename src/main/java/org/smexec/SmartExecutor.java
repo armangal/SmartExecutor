@@ -158,4 +158,13 @@ public class SmartExecutor {
         }
         throw new RuntimeException("Configaration for pool:" + poolName + " were not found.");
     }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("SmartExecutor:\n");
+        for (ISmartThreadPool smartThreadPool : threadPoolMap.values()) {
+            sb.append(smartThreadPool.toString()).append("\n");
+        }
+        return sb.toString();
+    }
 }

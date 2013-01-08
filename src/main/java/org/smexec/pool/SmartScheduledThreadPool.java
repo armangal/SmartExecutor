@@ -34,7 +34,8 @@ public class SmartScheduledThreadPool
     private PoolConfiguration poolConfiguration;
 
     public SmartScheduledThreadPool(final PoolConfiguration poolConfiguration) {
-
+        this.poolConfiguration = poolConfiguration;
+        
         pool = Executors.newScheduledThreadPool(poolConfiguration.getCorePollSize(), new ThreadFactory() {
 
             protected final AtomicInteger threadNumber = new AtomicInteger(0);
