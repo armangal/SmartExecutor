@@ -4,22 +4,23 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A wrapper Runnble for internal usage. <br>
+ * A wrapper Runnable for internal usage. <br>
  * I allows us to better control the thread execution, hooks and thread naming.
  */
-public class SmartRunnble
+public class SmartRunnable
     implements Runnable {
 
-    private static Logger logger = LoggerFactory.getLogger(SmartRunnble.class);
+    private static Logger logger = LoggerFactory.getLogger(SmartRunnable.class);
+
     private Runnable runnable;
     private String threadNameSuffix;
 
-    public SmartRunnble(Runnable runnable, String threadNameSuffix) {
+    public SmartRunnable(Runnable runnable, String threadNameSuffix) {
         this.runnable = runnable;
         this.threadNameSuffix = threadNameSuffix;
     }
 
-    public SmartRunnble(Runnable runnable) {
+    public SmartRunnable(Runnable runnable) {
         this.runnable = runnable;
     }
 
