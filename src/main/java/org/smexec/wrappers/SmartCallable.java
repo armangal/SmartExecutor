@@ -1,4 +1,4 @@
-package org.smexec;
+package org.smexec.wrappers;
 
 import java.util.concurrent.Callable;
 
