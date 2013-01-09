@@ -31,8 +31,8 @@ import org.smexec.configuration.PoolConfiguration;
 import org.smexec.configuration.PoolType;
 import org.smexec.pool.ISmartScheduledThreadPool;
 import org.smexec.pool.ISmartThreadPool;
-import org.smexec.pool.SmartScheduledThreadPool;
-import org.smexec.pool.SmartThreadPool;
+import org.smexec.pool.impl.SmartScheduledThreadPool;
+import org.smexec.pool.impl.SmartThreadPool;
 
 /**
  * The main entry point to utilize SmartExecutor

@@ -14,54 +14,37 @@
  */
 package org.smexec.pool.impl;
 
-import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.smexec.SmartCallable;
 import org.smexec.SmartRunnable;
 import org.smexec.configuration.PoolConfiguration;
-import org.smexec.pool.ISmartThreadPool;
+import org.smexec.pool.ISmartCachedThreadPool;
 
-public class SmartThreadPool
-    implements ISmartThreadPool {
+public class SmartCachedThreadPool
+    implements ISmartCachedThreadPool {
 
-    private ThreadPoolExecutor pool;
+    private ExecutorService pool;
 
     private PoolConfiguration poolConfiguration;
 
-    public SmartThreadPool(final PoolConfiguration poolConfiguration) {
+    public SmartCachedThreadPool(final PoolConfiguration poolConfiguration) {
         this.poolConfiguration = poolConfiguration;
 
-        BlockingQueue<Runnable> workQueue;
+        this.pool = Executors.newCachedThreadPool(new ThreadFactory() {
 
-        if (poolConfiguration.getQueueSize() == -1) {
-            workQueue = new SynchronousQueue<Runnable>();
-        } else {
-            workQueue = new LinkedBlockingQueue<Runnable>(poolConfiguration.getQueueSize());
+            protected final AtomicInteger threadNumber = new AtomicInteger(0);
 
-        }
-
-        pool = new ThreadPoolExecutor(poolConfiguration.getCorePollSize(),
-                                      poolConfiguration.getMaxPoolSize(),
-                                      poolConfiguration.getKeepAliveTime(),
-                                      TimeUnit.MILLISECONDS,
-                                      workQueue,
-                                      new ThreadFactory() {
-
-                                          protected final AtomicInteger threadNumber = new AtomicInteger(0);
-
-                                          @Override
-                                          public Thread newThread(Runnable r) {
-                                              // SER means SmartExecutorRegular pool
-                                              return new Thread(r, "SER_" + poolConfiguration.getPoolNameShort() + "_" + threadNumber.incrementAndGet());
-                                          }
-                                      });
+            @Override
+            public Thread newThread(Runnable r) {
+                // SER means SmartExecutorCached pool
+                return new Thread(r, "SEC_" + poolConfiguration.getPoolNameShort() + "_" + threadNumber.incrementAndGet());
+            }
+        });
 
     }
 
@@ -80,6 +63,6 @@ public class SmartThreadPool
 
     @Override
     public String toString() {
-        return "SmartThreadPool [" + poolConfiguration + "]";
+        return "SmartCachedThreadPool [" + poolConfiguration + "]";
     }
 }
