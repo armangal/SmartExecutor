@@ -12,7 +12,7 @@
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
  * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package org.smexec.pool;
+package org.smexec.pool.impl;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -25,6 +25,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.smexec.SmartCallable;
 import org.smexec.SmartRunnable;
 import org.smexec.configuration.PoolConfiguration;
+import org.smexec.pool.ISmartScheduledThreadPool;
 
 public class SmartScheduledThreadPool
     implements ISmartScheduledThreadPool {
