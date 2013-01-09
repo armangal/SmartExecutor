@@ -3,8 +3,8 @@ package org.smexec.pool;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-import org.smexec.SmartCallable;
-import org.smexec.SmartRunnable;
+import org.smexec.wrappers.SmartCallable;
+import org.smexec.wrappers.SmartRunnable;
 
 public interface ISmartScheduledThreadPool
     extends ISmartThreadPool {

@@ -23,10 +23,10 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.smexec.SmartCallable;
-import org.smexec.SmartRunnable;
 import org.smexec.configuration.PoolConfiguration;
 import org.smexec.pool.ISmartThreadPool;
+import org.smexec.wrappers.SmartCallable;
+import org.smexec.wrappers.SmartRunnable;
 
 public class SmartThreadPool
     implements ISmartThreadPool {

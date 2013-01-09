@@ -33,6 +33,8 @@ import org.smexec.pool.ISmartScheduledThreadPool;
 import org.smexec.pool.ISmartThreadPool;
 import org.smexec.pool.impl.SmartScheduledThreadPool;
 import org.smexec.pool.impl.SmartThreadPool;
+import org.smexec.wrappers.SmartCallable;
+import org.smexec.wrappers.SmartRunnable;
 
 /**
  * The main entry point to utilize SmartExecutor

@@ -2,8 +2,8 @@ package org.smexec.pool;
 
 import java.util.concurrent.Future;
 
-import org.smexec.SmartCallable;
-import org.smexec.SmartRunnable;
+import org.smexec.wrappers.SmartCallable;
+import org.smexec.wrappers.SmartRunnable;
 
 public interface ISmartThreadPool {
 
