@@ -28,9 +28,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.smexec.configuration.Config;
 import org.smexec.configuration.PoolConfiguration;
-import org.smexec.configuration.PoolType;
 import org.smexec.pool.ISmartScheduledThreadPool;
 import org.smexec.pool.ISmartThreadPool;
+import org.smexec.pool.impl.SmartCachedThreadPool;
 import org.smexec.pool.impl.SmartScheduledThreadPool;
 import org.smexec.pool.impl.SmartThreadPool;
 import org.smexec.wrappers.SmartCallable;
@@ -134,11 +134,11 @@ public class SmartExecutor {
     }
 
     private ISmartThreadPool getPool(String poolName) {
-        if (threadPoolMap.contains(poolName)) {
+        if (threadPoolMap.containsKey(poolName)) {
             return threadPoolMap.get(poolName);
         } else {
             synchronized (threadPoolMap) {
-                if (threadPoolMap.contains(poolName)) {
+                if (threadPoolMap.containsKey(poolName)) {
                     return threadPoolMap.get(poolName);
                 } else {
                     ISmartThreadPool threadPool = initThreadPool(poolName);
@@ -152,10 +152,13 @@ public class SmartExecutor {
     private ISmartThreadPool initThreadPool(String poolName) {
         PoolConfiguration poolConfiguration = config.getPoolConfiguration(poolName);
         if (poolConfiguration != null) {
-            if (poolConfiguration.getPoolType().equals(PoolType.regular)) {
-                return new SmartThreadPool(poolConfiguration);
-            } else {
-                return new SmartScheduledThreadPool(poolConfiguration);
+            switch (poolConfiguration.getPoolType()) {
+                case regular:
+                    return new SmartThreadPool(poolConfiguration);
+                case cached:
+                    return new SmartCachedThreadPool(poolConfiguration);
+                case scheduled:
+                    return new SmartScheduledThreadPool(poolConfiguration);
             }
         }
         throw new RuntimeException("Configaration for pool:" + poolName + " were not found.");

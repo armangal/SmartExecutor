@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<SmartExecutor xmlns:ns2="http://www.armangal.com/smartexecutor/v1" >
+<SmartExecutor xmlns:ns2="http://www.armangal.com/smartexecutor/v1">
 
 	<pools>
 		<pool>
@@ -34,6 +34,11 @@
 			<poolNameShort>STP2</poolNameShort>
 			<corePollSize>5</corePollSize>
 			<poolType>scheduled</poolType>
+		</pool>
+		<pool>
+			<poolName>Cached1</poolName>
+			<poolNameShort>CTP</poolNameShort>
+			<poolType>cached</poolType>
 		</pool>
 	</pools>
 </SmartExecutor>
