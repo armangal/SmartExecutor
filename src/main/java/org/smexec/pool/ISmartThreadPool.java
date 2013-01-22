@@ -12,5 +12,7 @@ public interface ISmartThreadPool {
     <T> Future<T> submit(SmartCallable<T> task);
     
     void shutdown();
+    
+    PoolStats getPoolStats();
 
 }

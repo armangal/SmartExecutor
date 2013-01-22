@@ -71,7 +71,7 @@ public class SmartExecutor {
 
     public void execute(Runnable command, String poolName, String threadNameSuffix) {
         ISmartThreadPool smartThreadPool = getPool(poolName);
-        SmartRunnable sr = new SmartRunnable(command, threadNameSuffix);
+        SmartRunnable sr = new SmartRunnable(command, threadNameSuffix, smartThreadPool.getPoolStats());
         smartThreadPool.execute(sr);
     }
 
@@ -95,25 +95,25 @@ public class SmartExecutor {
 
     public ScheduledFuture<?> schedule(Runnable command, long delay, TimeUnit unit, String poolName, String threadName) {
         ISmartScheduledThreadPool scheduledPool = getScheduledPool(poolName);
-        SmartRunnable sr = new SmartRunnable(command, threadName);
+        SmartRunnable sr = new SmartRunnable(command, threadName, scheduledPool.getPoolStats());
         return scheduledPool.schedule(sr, delay, unit);
     }
 
     public <V> ScheduledFuture<V> schedule(Callable<V> callable, long delay, TimeUnit unit, String poolName, String threadName) {
         ISmartScheduledThreadPool scheduledPool = getScheduledPool(poolName);
-        SmartCallable<V> sc = new SmartCallable<V>(callable, threadName);
+        SmartCallable<V> sc = new SmartCallable<V>(callable, threadName, scheduledPool.getPoolStats());
         return scheduledPool.schedule(sc, delay, unit);
     }
 
     public ScheduledFuture<?> scheduleAtFixedRate(Runnable command, long initialDelay, long period, TimeUnit unit, String poolName, String threadName) {
         ISmartScheduledThreadPool scheduledPool = getScheduledPool(poolName);
-        SmartRunnable sr = new SmartRunnable(command, threadName);
+        SmartRunnable sr = new SmartRunnable(command, threadName, scheduledPool.getPoolStats());
         return scheduledPool.scheduleAtFixedRate(sr, initialDelay, period, unit);
     }
 
     public ScheduledFuture<?> scheduleWithFixedDelay(Runnable command, long initialDelay, long delay, TimeUnit unit, String poolName, String threadName) {
         ISmartScheduledThreadPool scheduledPool = getScheduledPool(poolName);
-        SmartRunnable sr = new SmartRunnable(command, threadName);
+        SmartRunnable sr = new SmartRunnable(command, threadName, scheduledPool.getPoolStats());
         return scheduledPool.scheduleWithFixedDelay(sr, initialDelay, delay, unit);
     }
 

@@ -17,6 +17,7 @@ package org.smexec.pool.impl;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -29,6 +30,7 @@ import org.smexec.wrappers.SmartCallable;
 import org.smexec.wrappers.SmartRunnable;
 
 public class SmartThreadPool
+    extends AbstractSmartPool
     implements ISmartThreadPool {
 
     private ThreadPoolExecutor pool;
@@ -66,11 +68,23 @@ public class SmartThreadPool
     }
 
     public void execute(SmartRunnable command) {
-        pool.execute(command);
+        try {
+            poolStats.incrementSubmitted();
+            pool.execute(command);
+        } catch (RejectedExecutionException e) {
+            poolStats.incrementRejected();
+            throw e;
+        }
     }
 
     public <T> Future<T> submit(SmartCallable<T> task) {
-        return pool.submit(task);
+        try {
+            poolStats.incrementSubmitted();
+            return pool.submit(task);
+        } catch (RejectedExecutionException e) {
+            poolStats.incrementRejected();
+            throw e;
+        }
     }
 
     @Override
@@ -80,6 +94,6 @@ public class SmartThreadPool
 
     @Override
     public String toString() {
-        return "SmartThreadPool [" + poolConfiguration + "]";
+        return "SmartThreadPool [" + poolConfiguration + "] " + super.toString();
     }
 }
