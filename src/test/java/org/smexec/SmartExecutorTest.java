@@ -3,6 +3,7 @@ package org.smexec;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.util.Random;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import javax.management.InstanceAlreadyExistsException;
@@ -13,24 +14,24 @@ import javax.management.NotCompliantMBeanException;
 import javax.management.ObjectName;
 import javax.xml.bind.JAXBException;
 
-import org.smexec.mbeans.StatsMBean;
 import org.smexec.mbeans.Stats;
-import org.smexec.run.Delayed;
+import org.smexec.run.SleepingThread;
 
 public class SmartExecutorTest {
 
     public static void main(String[] args)
-        throws IOException, JAXBException, MalformedObjectNameException, NullPointerException, InstanceAlreadyExistsException, MBeanRegistrationException, NotCompliantMBeanException, InterruptedException {
+        throws IOException, JAXBException, MalformedObjectNameException, NullPointerException, InstanceAlreadyExistsException, MBeanRegistrationException,
+        NotCompliantMBeanException, InterruptedException {
 
-        MBeanServer mbs = ManagementFactory.getPlatformMBeanServer(); 
-        
-        ObjectName name = new ObjectName("org.smexec.mbeans:type=Stats"); 
-   
-        Stats mbean = new Stats(); 
-   
-        mbs.registerMBean(mbean, name); 
-        
-        SmartExecutor se = new SmartExecutor("SmartExecutor-test.xml");
+        MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+
+        ObjectName name = new ObjectName("org.smexec.mbeans:type=Stats");
+
+        Stats mbean = new Stats();
+
+        mbs.registerMBean(mbean, name);
+
+        final SmartExecutor se = new SmartExecutor("SmartExecutor-test.xml");
 
         Runnable command = new Runnable() {
 
@@ -53,19 +54,37 @@ public class SmartExecutorTest {
 
         se.execute(command, "Custom1", "CCC");
 
-        se.scheduleAtFixedRate(command, 1000l, 1000l, TimeUnit.MILLISECONDS, PoolNamesTest.SCHEDULED_POOL, "EverySecond");
+        se.scheduleAtFixedRate(new Runnable() {
+
+            @Override
+            public void run() {
+                System.out.println(se.toString());
+            }
+        }, 5000l, 5000l, TimeUnit.MILLISECONDS, PoolNamesTest.SCHEDULED_POOL, "EverySecond");
 
         se.scheduleAtFixedRate(command, 1000l, 1000l, TimeUnit.MILLISECONDS, "Scheduled2", "EverySecond");
 
-        for (int i = 0; i < 1000; i++) {
+        // check rejection
+        int rejected = 0;
+        for (int i = 0; i < 200; i++) {
+            try {
+                se.execute(command, PoolNamesTest.DEFAULT_POOL, "Reject");
+            } catch (RejectedExecutionException e) {
+                rejected++;
+            }
+        }
+        System.out.println("Rejected:" + rejected);
+
+        for (int i = 0; i < 10; i++) {
             se.execute(command, "Cached1", "Cached");
         }
         System.out.println(se);
-        
+
         do {
-            Delayed d = new Delayed(new Random().nextInt(1000));
-            se.execute(d, PoolNamesTest.DEFAULT_POOL, "DEL");
+            SleepingThread d = new SleepingThread(new Random().nextInt(1000));
+            se.execute(d, "Custom1", "SLP");
             Thread.sleep(1000l);
-        } while(true);
+        } while (true);
+
     }
 }
