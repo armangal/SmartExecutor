@@ -139,6 +139,12 @@ public class SmartExecutor {
         return scheduledPool.scheduleAtFixedRate(sr, initialDelay, period, unit);
     }
 
+    public ScheduledFuture<?> scheduleAtFixedRate(Runnable command, long initialDelay, long period, TimeUnit unit, String threadName) {
+        ISmartScheduledThreadPool scheduledPool = getScheduledPool(getPoolName(command));
+        SmartRunnable sr = new SmartRunnable(command, threadName, scheduledPool.getPoolStats());
+        return scheduledPool.scheduleAtFixedRate(sr, initialDelay, period, unit);
+    }
+
     public ScheduledFuture<?> scheduleWithFixedDelay(Runnable command, long initialDelay, long delay, TimeUnit unit, String poolName, String threadName) {
         ISmartScheduledThreadPool scheduledPool = getScheduledPool(poolName);
         SmartRunnable sr = new SmartRunnable(command, threadName, scheduledPool.getPoolStats());

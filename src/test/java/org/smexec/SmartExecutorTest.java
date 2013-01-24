@@ -16,6 +16,7 @@ import javax.xml.bind.JAXBException;
 
 import org.smexec.mbeans.Stats;
 import org.smexec.run.AnnotatedSleepingThread;
+import org.smexec.run.SEStatsPrinter;
 import org.smexec.run.SleepingThreadPoolAware;
 
 public class SmartExecutorTest {
@@ -43,13 +44,7 @@ public class SmartExecutorTest {
 
         se.execute(command, "Custom1", "CCC");
 
-        se.scheduleAtFixedRate(new Runnable() {
-
-            @Override
-            public void run() {
-                System.out.println(se.toString());
-            }
-        }, 5000l, 5000l, TimeUnit.MILLISECONDS, PoolNamesTest.SCHEDULED_POOL, "EverySecond");
+        se.scheduleAtFixedRate(new SEStatsPrinter(se), 5000l, 5000l, TimeUnit.MILLISECONDS, "Stats");
 
         se.scheduleAtFixedRate(command, 1000l, 1000l, TimeUnit.MILLISECONDS, "Scheduled2", "EverySecond");
 
