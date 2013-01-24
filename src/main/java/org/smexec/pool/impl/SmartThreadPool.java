@@ -35,8 +35,6 @@ public class SmartThreadPool
 
     private ThreadPoolExecutor pool;
 
-    private PoolConfiguration poolConfiguration;
-
     public SmartThreadPool(final PoolConfiguration poolConfiguration) {
         this.poolConfiguration = poolConfiguration;
 

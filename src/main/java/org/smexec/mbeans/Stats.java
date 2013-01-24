@@ -1,27 +1,23 @@
 package org.smexec.mbeans;
 
-import java.util.Date;
+import org.smexec.pool.ISmartThreadPool;
 
 public class Stats
     implements StatsMBean {
 
-    public Stats() {}
+    private ISmartThreadPool stp;
+
+    public Stats(ISmartThreadPool stp) {
+        this.stp = stp;
+    }
 
     @Override
-    public String getName() {
-        return "Nameee:" + new Date();
+    public String getStats() {
+        return stp.getPoolStats().toString();
     }
 
     @Override
     public void printStats() {
-
-        printStats("blabla");
+        System.out.println(stp.getPoolStats().toString());
     }
-
-    @Override
-    public String printStats(String text) {
-        System.out.println(text);
-        return getName();
-    }
-
 }

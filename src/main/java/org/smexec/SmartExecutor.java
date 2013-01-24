@@ -15,12 +15,19 @@
 package org.smexec;
 
 import java.io.InputStream;
+import java.lang.management.ManagementFactory;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+import javax.management.InstanceAlreadyExistsException;
+import javax.management.MBeanRegistrationException;
+import javax.management.MBeanServer;
+import javax.management.MalformedObjectNameException;
+import javax.management.NotCompliantMBeanException;
+import javax.management.ObjectName;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 
@@ -29,6 +36,7 @@ import org.slf4j.LoggerFactory;
 import org.smexec.annotation.ThreadPoolName;
 import org.smexec.configuration.Config;
 import org.smexec.configuration.PoolConfiguration;
+import org.smexec.mbeans.Stats;
 import org.smexec.pool.ISmartScheduledThreadPool;
 import org.smexec.pool.ISmartThreadPool;
 import org.smexec.pool.impl.SmartCachedThreadPool;
@@ -51,6 +59,8 @@ public class SmartExecutor {
     private ConcurrentHashMap<String, ISmartThreadPool> threadPoolMap = new ConcurrentHashMap<String, ISmartThreadPool>(0);
 
     private Config config;
+    
+    private MBeanServer mbs;
 
     public SmartExecutor()
         throws JAXBException {
@@ -68,6 +78,8 @@ public class SmartExecutor {
         config = (Config) context.createUnmarshaller().unmarshal(configXML);
 
         logger.info("Initilized SmartExecutor with properties:{}", config);
+        
+        this.mbs = ManagementFactory.getPlatformMBeanServer();
     }
 
     public void execute(Runnable command, String poolName, String threadNameSuffix) {
@@ -177,6 +189,14 @@ public class SmartExecutor {
                 } else {
                     ISmartThreadPool threadPool = initThreadPool(poolName);
                     threadPoolMap.put(poolName, threadPool);
+                    
+                    try {
+                        Stats mbean = new Stats(threadPool);
+                        mbs.registerMBean(mbean, new ObjectName("org.smexec.threadPools:type="+threadPool.getPoolName()));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
                     return threadPool;
                 }
             }

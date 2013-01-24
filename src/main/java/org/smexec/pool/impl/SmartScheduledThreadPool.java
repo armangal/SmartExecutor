@@ -34,8 +34,6 @@ public class SmartScheduledThreadPool
 
     private ScheduledExecutorService pool;
 
-    private PoolConfiguration poolConfiguration;
-
     public SmartScheduledThreadPool(final PoolConfiguration poolConfiguration) {
         this.poolConfiguration = poolConfiguration;
 

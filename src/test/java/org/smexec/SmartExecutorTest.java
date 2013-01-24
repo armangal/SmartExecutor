@@ -1,20 +1,16 @@
 package org.smexec;
 
 import java.io.IOException;
-import java.lang.management.ManagementFactory;
 import java.util.Random;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import javax.management.InstanceAlreadyExistsException;
 import javax.management.MBeanRegistrationException;
-import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
 import javax.management.NotCompliantMBeanException;
-import javax.management.ObjectName;
 import javax.xml.bind.JAXBException;
 
-import org.smexec.mbeans.Stats;
 import org.smexec.run.AnnotatedSleepingThread;
 import org.smexec.run.SEStatsPrinter;
 import org.smexec.run.SleepingThreadPoolAware;
@@ -24,14 +20,6 @@ public class SmartExecutorTest {
     public static void main(String[] args)
         throws IOException, JAXBException, MalformedObjectNameException, NullPointerException, InstanceAlreadyExistsException, MBeanRegistrationException,
         NotCompliantMBeanException, InterruptedException {
-
-        MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-
-        ObjectName name = new ObjectName("org.smexec.mbeans:type=Stats");
-
-        Stats mbean = new Stats();
-
-        mbs.registerMBean(mbean, name);
 
         final SmartExecutor se = new SmartExecutor("SmartExecutor-test.xml");
 

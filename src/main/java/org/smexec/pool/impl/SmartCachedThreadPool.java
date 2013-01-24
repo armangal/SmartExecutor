@@ -32,8 +32,6 @@ public class SmartCachedThreadPool
 
     private ExecutorService pool;
 
-    private PoolConfiguration poolConfiguration;
-
     public SmartCachedThreadPool(final PoolConfiguration poolConfiguration) {
         this.poolConfiguration = poolConfiguration;
 

@@ -1,5 +1,6 @@
 package org.smexec.pool.impl;
 
+import org.smexec.configuration.PoolConfiguration;
 import org.smexec.pool.ISmartThreadPool;
 import org.smexec.pool.PoolStats;
 
@@ -8,6 +9,8 @@ public abstract class AbstractSmartPool
 
     PoolStats poolStats = new PoolStats();
     
+    PoolConfiguration poolConfiguration;
+
     
     public PoolStats getPoolStats() {
         return poolStats;
@@ -16,5 +19,11 @@ public abstract class AbstractSmartPool
     @Override
     public String toString() {
         return "Stats [" + poolStats + "]";
+    }
+    
+    
+    @Override
+    public String getPoolName() {
+        return poolConfiguration.getPoolName();
     }
 }

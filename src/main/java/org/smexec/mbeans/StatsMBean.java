@@ -2,10 +2,8 @@ package org.smexec.mbeans;
 
 
 public interface StatsMBean {
-    String getName();
+    String getStats();
     
     void printStats();
-
-    String printStats(String text);
     
 }

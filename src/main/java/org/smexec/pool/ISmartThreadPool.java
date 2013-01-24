@@ -14,5 +14,7 @@ public interface ISmartThreadPool {
     void shutdown();
     
     PoolStats getPoolStats();
+    
+    String getPoolName();
 
 }
