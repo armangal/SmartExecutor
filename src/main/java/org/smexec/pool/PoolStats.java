@@ -6,6 +6,7 @@ public class PoolStats {
 
     private AtomicLong submitted = new AtomicLong(0);
     private AtomicLong executed = new AtomicLong(0);
+    private AtomicLong completed = new AtomicLong(0);
     private AtomicLong rejected = new AtomicLong(0);
     private AtomicLong failed = new AtomicLong(0);
     private AtomicLong minTime = new AtomicLong(Long.MAX_VALUE);
@@ -28,6 +29,10 @@ public class PoolStats {
         return failed.incrementAndGet();
     }
 
+    public long incrementCompleted() {
+        return completed.incrementAndGet();
+    }
+
     public void updateTimings(long executionDuration) {
         if (executionDuration > maxTime.get()) {
             maxTime.set(executionDuration);
@@ -36,6 +41,7 @@ public class PoolStats {
             minTime.set(executionDuration);
         }
         totalTime.addAndGet(executionDuration);
+        completed.incrementAndGet();
     }
 
     @Override
@@ -45,6 +51,8 @@ public class PoolStats {
                .append(submitted)
                .append(", executed=")
                .append(executed)
+               .append(", completed=")
+               .append(completed)
                .append(", rejected=")
                .append(rejected)
                .append(", failed=")

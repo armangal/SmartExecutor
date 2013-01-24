@@ -26,6 +26,7 @@ import javax.xml.bind.JAXBException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.smexec.annotation.ThreadPoolName;
 import org.smexec.configuration.Config;
 import org.smexec.configuration.PoolConfiguration;
 import org.smexec.pool.ISmartScheduledThreadPool;
@@ -80,7 +81,34 @@ public class SmartExecutor {
     }
 
     public void execute(Runnable command) {
-        execute(command, defaultPoolName, null);
+        execute(command, getPoolName(command), null);
+    }
+
+    public void execute(String threadNameSuffix, Runnable command) {
+        execute(command, getPoolName(command), threadNameSuffix);
+    }
+
+    /**
+     * determine the pool name by reading the annotation or interface
+     * 
+     * @param r
+     * @return
+     */
+    private String getPoolName(Runnable r) {
+        ThreadPoolName annotation = r.getClass().getAnnotation(ThreadPoolName.class);
+        if (annotation != null) {
+            if (annotation.poolName() != null) {
+                return annotation.poolName();
+            } else {
+                return defaultPoolName;
+            }
+        } else {
+            if (r instanceof IThreadPoolAware) {
+                return ((IThreadPoolAware) r).getPoolName();
+            }
+        }
+
+        return defaultPoolName;
     }
 
     public <T> Future<T> submit(Callable<T> task, String poolName) {

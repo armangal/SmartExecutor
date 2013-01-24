@@ -15,7 +15,8 @@ import javax.management.ObjectName;
 import javax.xml.bind.JAXBException;
 
 import org.smexec.mbeans.Stats;
-import org.smexec.run.SleepingThread;
+import org.smexec.run.AnnotatedSleepingThread;
+import org.smexec.run.SleepingThreadPoolAware;
 
 public class SmartExecutorTest {
 
@@ -33,20 +34,8 @@ public class SmartExecutorTest {
 
         final SmartExecutor se = new SmartExecutor("SmartExecutor-test.xml");
 
-        Runnable command = new Runnable() {
-
-            @Override
-            public void run() {
-                System.out.println("Run1:" + Thread.currentThread().getName());
-                try {
-                    Thread.currentThread().sleep(10000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        };
-
-        se.execute(command, PoolNamesTest.DEFAULT_POOL);
+        Runnable command = new SleepingThreadPoolAware(10000L);
+        se.execute(command);
 
         se.execute(command, PoolNamesTest.DEFAULT_POOL, "XXX");
 
@@ -81,8 +70,15 @@ public class SmartExecutorTest {
         System.out.println(se);
 
         do {
-            SleepingThread d = new SleepingThread(new Random().nextInt(1000));
-            se.execute(d, "Custom1", "SLP");
+            Random random = new Random();
+            for (int k = 0; k < random.nextInt(10) + 5; k++) {
+                try {
+                    AnnotatedSleepingThread d = new AnnotatedSleepingThread(random.nextInt(1000));
+                    se.execute("SLP", d);
+                } catch (Exception e) {
+                    //
+                }
+            }
             Thread.sleep(1000l);
         } while (true);
 
