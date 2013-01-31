@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
 import org.smexec.annotation.ThreadPoolName;
 import org.smexec.configuration.Config;
 import org.smexec.configuration.PoolConfiguration;
-import org.smexec.mbeans.Stats;
+import org.smexec.mbeans.PoolStats;
 import org.smexec.pool.ISmartScheduledThreadPool;
 import org.smexec.pool.ISmartThreadPool;
 import org.smexec.pool.impl.SmartCachedThreadPool;
@@ -50,7 +50,7 @@ import org.smexec.wrappers.SmartRunnable;
  */
 public class SmartExecutor {
 
-    private static Logger logger = LoggerFactory.getLogger("SE");
+    private static final Logger logger = LoggerFactory.getLogger("SE");
 
     private static final String defaultXMLConfName = "SmartExecutor-default.xml";
     private static final String defaultPoolName = "Default";
@@ -191,8 +191,8 @@ public class SmartExecutor {
                     threadPoolMap.put(poolName, threadPool);
                     
                     try {
-                        Stats mbean = new Stats(threadPool);
-                        mbs.registerMBean(mbean, new ObjectName("org.smexec.threadPools:type="+threadPool.getPoolName()));
+                        PoolStats mbean = new PoolStats(threadPool);
+                        mbs.registerMBean(mbean, new ObjectName("org.smexec:type=Pools,name="+threadPool.getPoolName()));
                     } catch (Exception e) {
                         e.printStackTrace();
                     }

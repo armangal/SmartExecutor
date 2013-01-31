@@ -33,12 +33,13 @@ public class SmartThreadPool
     extends AbstractSmartPool
     implements ISmartThreadPool {
 
-    private ThreadPoolExecutor pool;
+    private final ThreadPoolExecutor pool;
 
     public SmartThreadPool(final PoolConfiguration poolConfiguration) {
+    	super();
         this.poolConfiguration = poolConfiguration;
 
-        BlockingQueue<Runnable> workQueue;
+        final BlockingQueue<Runnable> workQueue;
 
         if (poolConfiguration.getQueueSize() == -1) {
             workQueue = new SynchronousQueue<Runnable>();
@@ -57,7 +58,7 @@ public class SmartThreadPool
                                           protected final AtomicInteger threadNumber = new AtomicInteger(0);
 
                                           @Override
-                                          public Thread newThread(Runnable r) {
+                                          public Thread newThread(final Runnable r) {
                                               // SER means SmartExecutorRegular pool
                                               return new Thread(r, "SER_" + poolConfiguration.getPoolNameShort() + "_" + threadNumber.incrementAndGet());
                                           }

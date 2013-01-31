@@ -7,9 +7,9 @@ import org.smexec.pool.PoolStats;
 public abstract class AbstractSmartPool
     implements ISmartThreadPool {
 
-    PoolStats poolStats = new PoolStats();
+    protected final PoolStats poolStats = new PoolStats();
     
-    PoolConfiguration poolConfiguration;
+    protected PoolConfiguration poolConfiguration;
 
     
     public PoolStats getPoolStats() {

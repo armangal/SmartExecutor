@@ -30,10 +30,11 @@ public class SmartCachedThreadPool
     extends AbstractSmartPool
     implements ISmartCachedThreadPool {
 
-    private ExecutorService pool;
+    private final ExecutorService pool;
 
     public SmartCachedThreadPool(final PoolConfiguration poolConfiguration) {
-        this.poolConfiguration = poolConfiguration;
+        super();
+    	this.poolConfiguration = poolConfiguration;
 
         this.pool = Executors.newCachedThreadPool(new ThreadFactory() {
 

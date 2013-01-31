@@ -11,7 +11,7 @@ import org.smexec.pool.PoolStats;
 public class SmartRunnable
     implements Runnable {
 
-    private static Logger logger = LoggerFactory.getLogger(SmartRunnable.class);
+    private static final Logger logger = LoggerFactory.getLogger(SmartRunnable.class);
 
     private Runnable runnable;
     private String threadNameSuffix;

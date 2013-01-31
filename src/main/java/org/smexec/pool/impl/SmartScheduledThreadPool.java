@@ -32,9 +32,10 @@ public class SmartScheduledThreadPool
     extends AbstractSmartPool
     implements ISmartScheduledThreadPool {
 
-    private ScheduledExecutorService pool;
+    private final ScheduledExecutorService pool;
 
     public SmartScheduledThreadPool(final PoolConfiguration poolConfiguration) {
+    	super();
         this.poolConfiguration = poolConfiguration;
 
         pool = Executors.newScheduledThreadPool(poolConfiguration.getCorePollSize(), new ThreadFactory() {

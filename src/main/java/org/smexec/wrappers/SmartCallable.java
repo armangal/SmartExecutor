@@ -3,7 +3,6 @@ package org.smexec.wrappers;
 import java.util.concurrent.Callable;
 
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlTransient;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +15,7 @@ import org.smexec.pool.PoolStats;
 public class SmartCallable<V>
     implements Callable<V> {
 
-    private static Logger logger = LoggerFactory.getLogger(SmartCallable.class);
+    private static final Logger logger = LoggerFactory.getLogger(SmartCallable.class);
 
     private Callable<V> callable;
     private String threadNameSuffix;
