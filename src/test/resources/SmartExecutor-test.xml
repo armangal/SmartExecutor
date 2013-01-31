@@ -1,44 +1,48 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <SmartExecutor xmlns:ns2="http://www.armangal.com/smartexecutor/v1">
 
-	<pools>
-		<pool>
-			<poolName>Default</poolName>
-			<poolNameShort>DTP</poolNameShort>
-			<corePollSize>2</corePollSize>
-			<maxPoolSize>3</maxPoolSize>
-			<queueSize>100</queueSize>
-			<keepAliveTime>1000</keepAliveTime>
-			<poolType>regular</poolType>
-		</pool>
+	<executor>
+		<name>Default Executor</name>
+		<description>Default Executor used in the system</description>
+		<pools>
+			<pool>
+				<poolName>Default</poolName>
+				<poolNameShort>DTP</poolNameShort>
+				<corePollSize>2</corePollSize>
+				<maxPoolSize>3</maxPoolSize>
+				<queueSize>100</queueSize>
+				<keepAliveTime>1000</keepAliveTime>
+				<poolType>regular</poolType>
+			</pool>
 
-		<pool>
-			<poolName>Custom1</poolName>
-			<poolNameShort>CM1</poolNameShort>
-			<corePollSize>2</corePollSize>
-			<maxPoolSize>2</maxPoolSize>
-			<queueSize>10</queueSize>
-			<keepAliveTime>1000</keepAliveTime>
-			<poolType>regular</poolType>
-		</pool>
+			<pool>
+				<poolName>Custom1</poolName>
+				<poolNameShort>CM1</poolNameShort>
+				<corePollSize>2</corePollSize>
+				<maxPoolSize>2</maxPoolSize>
+				<queueSize>10</queueSize>
+				<keepAliveTime>1000</keepAliveTime>
+				<poolType>regular</poolType>
+			</pool>
 
-		<pool>
-			<poolName>Scheduled</poolName>
-			<poolNameShort>STP1</poolNameShort>
-			<corePollSize>5</corePollSize>
-			<poolType>scheduled</poolType>
-		</pool>
+			<pool>
+				<poolName>Scheduled</poolName>
+				<poolNameShort>STP1</poolNameShort>
+				<corePollSize>5</corePollSize>
+				<poolType>scheduled</poolType>
+			</pool>
 
-		<pool>
-			<poolName>Scheduled2</poolName>
-			<poolNameShort>STP2</poolNameShort>
-			<corePollSize>5</corePollSize>
-			<poolType>scheduled</poolType>
-		</pool>
-		<pool>
-			<poolName>Cached1</poolName>
-			<poolNameShort>CTP</poolNameShort>
-			<poolType>cached</poolType>
-		</pool>
-	</pools>
+			<pool>
+				<poolName>Scheduled2</poolName>
+				<poolNameShort>STP2</poolNameShort>
+				<corePollSize>5</corePollSize>
+				<poolType>scheduled</poolType>
+			</pool>
+			<pool>
+				<poolName>Cached1</poolName>
+				<poolNameShort>CTP</poolNameShort>
+				<poolType>cached</poolType>
+			</pool>
+		</pools>
+	</executor>
 </SmartExecutor>

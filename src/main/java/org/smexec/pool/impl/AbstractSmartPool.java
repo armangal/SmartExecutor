@@ -26,4 +26,8 @@ public abstract class AbstractSmartPool
     public String getPoolName() {
         return poolConfiguration.getPoolName();
     }
+    
+    public PoolConfiguration getPoolConfiguration() {
+		return poolConfiguration;
+	}
 }

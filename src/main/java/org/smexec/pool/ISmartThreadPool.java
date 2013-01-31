@@ -2,6 +2,7 @@ package org.smexec.pool;
 
 import java.util.concurrent.Future;
 
+import org.smexec.configuration.PoolConfiguration;
 import org.smexec.wrappers.SmartCallable;
 import org.smexec.wrappers.SmartRunnable;
 
@@ -16,5 +17,7 @@ public interface ISmartThreadPool {
     PoolStats getPoolStats();
     
     String getPoolName();
+    
+    PoolConfiguration getPoolConfiguration();
 
 }

@@ -36,6 +36,7 @@ import org.slf4j.LoggerFactory;
 import org.smexec.annotation.ThreadPoolName;
 import org.smexec.configuration.Config;
 import org.smexec.configuration.PoolConfiguration;
+import org.smexec.mbeans.ExecutorStats;
 import org.smexec.mbeans.PoolStats;
 import org.smexec.pool.ISmartScheduledThreadPool;
 import org.smexec.pool.ISmartThreadPool;
@@ -59,7 +60,7 @@ public class SmartExecutor {
     private ConcurrentHashMap<String, ISmartThreadPool> threadPoolMap = new ConcurrentHashMap<String, ISmartThreadPool>(0);
 
     private Config config;
-    
+
     private MBeanServer mbs;
 
     public SmartExecutor()
@@ -78,8 +79,17 @@ public class SmartExecutor {
         config = (Config) context.createUnmarshaller().unmarshal(configXML);
 
         logger.info("Initilized SmartExecutor with properties:{}", config);
-        
+
         this.mbs = ManagementFactory.getPlatformMBeanServer();
+        
+        ExecutorStats es = new ExecutorStats(config.getExecutorConfiguration());
+        
+        try {
+            mbs.registerMBean(es, new ObjectName("org.smexec:type=SmartExecutor,name=" + config.getExecutorConfiguration().getName()));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
     }
 
     public void execute(Runnable command, String poolName, String threadNameSuffix) {
@@ -189,10 +199,11 @@ public class SmartExecutor {
                 } else {
                     ISmartThreadPool threadPool = initThreadPool(poolName);
                     threadPoolMap.put(poolName, threadPool);
-                    
+
                     try {
                         PoolStats mbean = new PoolStats(threadPool);
-                        mbs.registerMBean(mbean, new ObjectName("org.smexec:type=Pools,name="+threadPool.getPoolName()));
+                        mbs.registerMBean(mbean, new ObjectName("org.smexec:type=SmartExecutor.Pools,name=" + threadPool.getPoolName() + "("
+                                                                + threadPool.getPoolConfiguration().getPoolNameShort() + ")"));
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -204,7 +215,7 @@ public class SmartExecutor {
     }
 
     private ISmartThreadPool initThreadPool(String poolName) {
-        PoolConfiguration poolConfiguration = config.getPoolConfiguration(poolName);
+        PoolConfiguration poolConfiguration = config.getExecutorConfiguration().getPoolConfiguration(poolName);
         if (poolConfiguration != null) {
             switch (poolConfiguration.getPoolType()) {
                 case regular:
