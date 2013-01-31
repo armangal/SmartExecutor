@@ -22,11 +22,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-import javax.management.InstanceAlreadyExistsException;
-import javax.management.MBeanRegistrationException;
 import javax.management.MBeanServer;
-import javax.management.MalformedObjectNameException;
-import javax.management.NotCompliantMBeanException;
 import javax.management.ObjectName;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -36,8 +32,8 @@ import org.slf4j.LoggerFactory;
 import org.smexec.annotation.ThreadPoolName;
 import org.smexec.configuration.Config;
 import org.smexec.configuration.PoolConfiguration;
-import org.smexec.mbeans.ExecutorStats;
-import org.smexec.mbeans.PoolStats;
+import org.smexec.jmx.ExecutorStats;
+import org.smexec.jmx.PoolStats;
 import org.smexec.pool.ISmartScheduledThreadPool;
 import org.smexec.pool.ISmartThreadPool;
 import org.smexec.pool.impl.SmartCachedThreadPool;
@@ -68,6 +64,10 @@ public class SmartExecutor {
         this(defaultXMLConfName);
     }
 
+    public int getActivePools() {
+        return threadPoolMap.size();
+    }
+
     public SmartExecutor(String configXMLresource)
         throws JAXBException {
         // TODO improve configuration loading API
@@ -81,15 +81,19 @@ public class SmartExecutor {
         logger.info("Initilized SmartExecutor with properties:{}", config);
 
         this.mbs = ManagementFactory.getPlatformMBeanServer();
-        
-        ExecutorStats es = new ExecutorStats(config.getExecutorConfiguration());
-        
+
+        ExecutorStats es = new ExecutorStats(this);
+
         try {
             mbs.registerMBean(es, new ObjectName("org.smexec:type=SmartExecutor,name=" + config.getExecutorConfiguration().getName()));
         } catch (Exception e) {
             e.printStackTrace();
         }
-        
+
+    }
+
+    public Config getConfig() {
+        return config;
     }
 
     public void execute(Runnable command, String poolName, String threadNameSuffix) {

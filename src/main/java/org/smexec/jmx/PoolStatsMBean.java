@@ -1,8 +1,8 @@
-package org.smexec.mbeans;
+package org.smexec.jmx;
+
+import java.util.List;
 
 public interface PoolStatsMBean {
-	String getStats();
-
 	void printStats();
 
 	Long getSubmitted();
@@ -22,4 +22,6 @@ public interface PoolStatsMBean {
 	Long getTotalTime();
 
 	Long getAvgTime();
+	
+	List<Integer> getStats();
 }

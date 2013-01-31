@@ -23,7 +23,7 @@ public class SmartExecutorTest {
 
         final SmartExecutor se = new SmartExecutor("SmartExecutor-test.xml");
 
-        Runnable command = new SleepingThreadPoolAware(10000L);
+        Runnable command = new SleepingThreadPoolAware(10011L);
         se.execute(command);
 
         se.execute(command, PoolNamesTest.DEFAULT_POOL, "XXX");
@@ -50,8 +50,8 @@ public class SmartExecutorTest {
         for (int i = 0; i < 10; i++) {
             se.execute(command, "Cached1", "Cached");
         }
-        System.out.println(se);
 
+        
         do {
             Random random = new Random();
             for (int k = 0; k < random.nextInt(10) + 5; k++) {
