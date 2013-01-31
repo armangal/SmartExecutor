@@ -1,10 +1,7 @@
 package org.smexec.jmx;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-
 import org.smexec.pool.ISmartThreadPool;
+import org.smexec.pool.PoolStatsData;
 
 public class PoolStats
     implements PoolStatsMBean {
@@ -74,12 +71,12 @@ public class PoolStats
     }
 
     @Override
-    public List<Integer> getStats() {
-        int x = 3;
-        List<Integer> is = new ArrayList<Integer>();
-        for (int i = 0; i < x; i++)
-            is.add(new Random().nextInt(100));
+    public String getChunks() {
+        StringBuilder builder = new StringBuilder();
+        for (PoolStatsData h : stp.getPoolStats().getHistory()) {
+            builder.append("[").append(h.getMaxTimeLong()).append(",").append(h.getAvgTime()).append(",").append(h.getMinTimeLong()).append("]");
+        }
 
-        return is;
+        return builder.toString();
     }
 }

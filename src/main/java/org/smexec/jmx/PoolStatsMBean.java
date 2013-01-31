@@ -1,6 +1,5 @@
 package org.smexec.jmx;
 
-import java.util.List;
 
 public interface PoolStatsMBean {
 	void printStats();
@@ -23,5 +22,5 @@ public interface PoolStatsMBean {
 
 	Long getAvgTime();
 	
-	List<Integer> getStats();
+	String getChunks();
 }

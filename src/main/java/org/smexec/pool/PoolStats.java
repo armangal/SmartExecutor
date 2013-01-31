@@ -1,108 +1,142 @@
 package org.smexec.pool;
 
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.LinkedList;
 
 public class PoolStats {
 
-	private AtomicLong submitted = new AtomicLong(0);
-	private AtomicLong executed = new AtomicLong(0);
-	private AtomicLong completed = new AtomicLong(0);
-	private AtomicLong rejected = new AtomicLong(0);
-	private AtomicLong failed = new AtomicLong(0);
-	private AtomicLong minTime = new AtomicLong(Long.MAX_VALUE);
-	private AtomicLong maxTime = new AtomicLong(Long.MIN_VALUE);
-	private AtomicLong totalTime = new AtomicLong(0);
+    private final PoolStatsData totalData = new PoolStatsData();
+    private final int chunks;
+    private LinkedList<PoolStatsData> history = new LinkedList<PoolStatsData>();
 
-	public long incrementSubmitted() {
-		return submitted.incrementAndGet();
-	}
+    public PoolStats(final int chunks) {
+        this.chunks = chunks;
+        history.add(new PoolStatsData());
+    }
 
-	public long incrementRejected() {
-		return rejected.incrementAndGet();
-	}
+    private PoolStatsData getCurrentChunk() {
+        return history.getLast();
+    }
 
-	public long incrementExecuted() {
-		return executed.incrementAndGet();
-	}
+    public void addChunk() {
+        history.add(new PoolStatsData());
+        if (history.size() > chunks) {
+            history.remove();
+        }
+    }
 
-	public long incrementFailed() {
-		return failed.incrementAndGet();
-	}
+    public long incrementSubmitted() {
+        getCurrentChunk().getSubmitted().incrementAndGet();
+        return totalData.getSubmitted().incrementAndGet();
+    }
 
-	public long incrementCompleted() {
-		return completed.incrementAndGet();
-	}
+    public long incrementRejected() {
+        getCurrentChunk().getRejected().incrementAndGet();
+        return totalData.getRejected().incrementAndGet();
+    }
 
-	public void updateTimings(long executionDuration) {
-		if (executionDuration > maxTime.get()) {
-			maxTime.set(executionDuration);
-		}
-		if (executionDuration < minTime.get()) {
-			minTime.set(executionDuration);
-		}
-		totalTime.addAndGet(executionDuration);
-		completed.incrementAndGet();
-	}
+    public long incrementExecuted() {
+        getCurrentChunk().getExecuted().incrementAndGet();
+        return totalData.getExecuted().incrementAndGet();
+    }
 
-	@Override
-	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("\nPoolStats [submitted=")
-				.append(submitted)
-				.append(", executed=")
-				.append(executed)
-				.append(", completed=")
-				.append(completed)
-				.append(", rejected=")
-				.append(rejected)
-				.append(", failed=")
-				.append(failed)
-				.append(", minTime=")
-				.append(minTime)
-				.append(", maxTime=")
-				.append(maxTime)
-				.append(", totalTime=")
-				.append(totalTime)
-				.append(", avgTime=")
-				.append(executed.get() == 0 ? "none"
-						: (totalTime.get() / executed.get())).append("]");
-		return builder.toString();
-	}
+    public long incrementFailed() {
+        getCurrentChunk().getFailed().incrementAndGet();
+        return totalData.getFailed().incrementAndGet();
+    }
 
-	public Long getSubmitted() {
-		return submitted.get();
-	}
+    public long incrementCompleted() {
+        getCurrentChunk().getCompleted().incrementAndGet();
+        return totalData.getCompleted().incrementAndGet();
+    }
 
-	public Long getExecuted() {
-		return executed.get();
-	}
+    public void updateTimings(long executionDuration) {
+        if (executionDuration > totalData.getMaxTime().get()) {
+            totalData.getMaxTime().set(executionDuration);
+        }
+        if (executionDuration < totalData.getMinTime().get()) {
+            totalData.getMinTime().set(executionDuration);
+        }
 
-	public Long getCompleted() {
-		return completed.get();
-	}
+        if (executionDuration > getCurrentChunk().getMaxTime().get()) {
+            getCurrentChunk().getMaxTime().set(executionDuration);
+        }
+        if (executionDuration < getCurrentChunk().getMinTime().get()) {
+            getCurrentChunk().getMinTime().set(executionDuration);
+        }
 
-	public Long getRejected() {
-		return rejected.get();
-	}
+        getCurrentChunk().getTotalTime().addAndGet(executionDuration);
+        totalData.getTotalTime().addAndGet(executionDuration);
 
-	public Long getFailed() {
-		return failed.get();
-	}
+        getCurrentChunk().getCompleted().incrementAndGet();
+        totalData.getCompleted().incrementAndGet();
+    }
 
-	public Long getMinTime() {
-		return minTime.get();
-	}
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("\nPoolStats [submitted=")
+               .append(totalData.getSubmitted())
+               .append(", executed=")
+               .append(totalData.getExecuted())
+               .append(", completed=")
+               .append(totalData.getCompleted())
+               .append(", rejected=")
+               .append(totalData.getRejected())
+               .append(", failed=")
+               .append(totalData.getFailed())
+               .append(", minTime=")
+               .append(totalData.getMinTime())
+               .append(", maxTime=")
+               .append(totalData.getMaxTime())
+               .append(", totalTime=")
+               .append(totalData.getTotalTime())
+               .append(", avgTime=")
+               .append(totalData.getAvgTime())
+               .append("]");
+        for (PoolStatsData h : history) {
+            builder.append("\n[").append(h.getMaxTime().get()).append(",").append(h.getAvgTime()).append(",").append(h.getMinTime().get()).append("]");
+        }
+        return builder.toString();
+    }
 
-	public Long getMaxTime() {
-		return maxTime.get();
-	}
+    public Long getSubmitted() {
+        return totalData.getSubmitted().get();
+    }
 
-	public Long getTotalTime() {
-		return totalTime.get();
-	}
+    public Long getExecuted() {
+        return totalData.getExecuted().get();
+    }
 
-	public Long getAvgTime() {
-		return (executed.get() == 0 ? 0 : (totalTime.get() / executed.get()));
-	}
+    public Long getCompleted() {
+        return totalData.getCompleted().get();
+    }
+
+    public Long getRejected() {
+        return totalData.getRejected().get();
+    }
+
+    public Long getFailed() {
+        return totalData.getFailed().get();
+    }
+
+    public Long getMinTime() {
+        return totalData.getMinTime().get();
+    }
+
+    public Long getMaxTime() {
+        return totalData.getMaxTime().get();
+    }
+
+    public Long getTotalTime() {
+        return totalData.getTotalTime().get();
+    }
+
+    public Long getAvgTime() {
+        return totalData.getAvgTime();
+    }
+
+    public LinkedList<PoolStatsData> getHistory() {
+        return history;
+    }
 
 }
