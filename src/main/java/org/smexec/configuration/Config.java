@@ -1,5 +1,6 @@
 package org.smexec.configuration;
 
+import javax.xml.bind.ValidationException;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -17,6 +18,10 @@ public class Config {
 
 	public ExecutorConfiguration getExecutorConfiguration() {
 		return executorConfiguration;
+	}
+	
+	public void validate() throws ValidationException {
+	    executorConfiguration.validate();
 	}
 
 }

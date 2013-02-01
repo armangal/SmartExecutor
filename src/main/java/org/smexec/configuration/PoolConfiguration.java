@@ -1,5 +1,6 @@
 package org.smexec.configuration;
 
+import javax.xml.bind.ValidationException;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -14,82 +15,60 @@ public class PoolConfiguration {
     private Integer maxPoolSize = 5;
     private Integer queueSize = -1;
     private Long keepAliveTime = 60000l;
-    private PoolType poolType = PoolType.regular;
+    private PoolType poolType;
     private int chunks = 100;
     private long chunkInterval = 10000;
 
     PoolConfiguration() {}
 
-    public String getPoolName() {
-        return poolName;
+    public void validate()
+        throws ValidationException {
+
+        if (poolType == null) {
+            throw new ValidationException("Pool Type not specified for:" + toString());
+        }
+        if (poolName == null || poolName.isEmpty()) {
+            throw new ValidationException("Pool name not specified for:" + toString());
+        }
+        if (poolNameShort == null || poolNameShort.isEmpty()) {
+            throw new ValidationException("Pool short anme not specified for:" + toString());
+        }
     }
 
-    public void setPoolName(String poolName) {
-        this.poolName = poolName;
+    public String getPoolName() {
+        return poolName;
     }
 
     public String getPoolNameShort() {
         return poolNameShort;
     }
 
-    public void setPoolNameShort(String poolNameShort) {
-        this.poolNameShort = poolNameShort;
-    }
-
     public Integer getCorePollSize() {
         return corePollSize;
-    }
-
-    public void setCorePollSize(Integer corePollSize) {
-        this.corePollSize = corePollSize;
     }
 
     public Integer getMaxPoolSize() {
         return maxPoolSize;
     }
 
-    public void setMaxPoolSize(Integer maxPoolSize) {
-        this.maxPoolSize = maxPoolSize;
-    }
-
     public Integer getQueueSize() {
         return queueSize;
-    }
-
-    public void setQueueSize(Integer queueSize) {
-        this.queueSize = queueSize;
     }
 
     public Long getKeepAliveTime() {
         return keepAliveTime;
     }
 
-    public void setKeepAliveTime(Long keepAliveTime) {
-        this.keepAliveTime = keepAliveTime;
-    }
-
     public PoolType getPoolType() {
         return poolType;
-    }
-
-    public void setPoolType(PoolType poolType) {
-        this.poolType = poolType;
     }
 
     public int getChunks() {
         return chunks;
     }
 
-    public void setChunks(int chunks) {
-        this.chunks = chunks;
-    }
-
     public long getChunkInterval() {
         return chunkInterval;
-    }
-
-    public void setChunkInterval(long chunkInterval) {
-        this.chunkInterval = chunkInterval;
     }
 
     @Override

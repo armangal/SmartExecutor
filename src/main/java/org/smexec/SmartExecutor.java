@@ -78,6 +78,8 @@ public class SmartExecutor {
         config = (Config) context.createUnmarshaller().unmarshal(configXML);
 
         logger.info("Initilized SmartExecutor with properties:{}", config);
+        
+        config.validate();
 
         this.mbs = ManagementFactory.getPlatformMBeanServer();
 
