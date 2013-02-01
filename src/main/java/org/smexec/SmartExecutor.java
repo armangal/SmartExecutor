@@ -44,7 +44,7 @@ import org.smexec.pool.impl.SmartScheduledThreadPool;
 import org.smexec.pool.impl.SmartThreadPool;
 
 /**
- * The main entry point to utilize SmartExecutor
+ * The main entry point to use SmartExecutor
  */
 public class SmartExecutor {
 
@@ -63,10 +63,6 @@ public class SmartExecutor {
     public SmartExecutor()
         throws JAXBException {
         this(defaultXMLConfName);
-    }
-
-    public int getActivePools() {
-        return threadPoolMap.size();
     }
 
     public SmartExecutor(String configXMLresource)
@@ -114,11 +110,11 @@ public class SmartExecutor {
     /**
      * determine the pool name by reading the annotation or interface
      * 
-     * @param r
+     * @param some
      * @return
      */
-    private String getPoolName(Runnable r) {
-        ThreadPoolName annotation = r.getClass().getAnnotation(ThreadPoolName.class);
+    private String getPoolName(Object some) {
+        ThreadPoolName annotation = some.getClass().getAnnotation(ThreadPoolName.class);
         if (annotation != null) {
             if (annotation.poolName() != null) {
                 return annotation.poolName();
@@ -126,8 +122,8 @@ public class SmartExecutor {
                 return defaultPoolName;
             }
         } else {
-            if (r instanceof IThreadPoolAware) {
-                return ((IThreadPoolAware) r).getPoolName();
+            if (some instanceof IThreadPoolAware) {
+                return ((IThreadPoolAware) some).getPoolName();
             }
         }
 
@@ -249,5 +245,9 @@ public class SmartExecutor {
             sb.append(smartThreadPool.toString()).append("\n");
         }
         return sb.toString();
+    }
+
+    public int getActivePools() {
+        return threadPoolMap.size();
     }
 }
