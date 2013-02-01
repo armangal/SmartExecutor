@@ -2,8 +2,8 @@
 <i>The framework is still under development, more documentation will be available soon.</i>
 ----
 
-SmartExecutor is a light-weight thread execution framework. 
-The goal of the framework is to provide easy controllable threads executions.
+SmartExecutor is a light-weight thread execution and thread-pools management framework. <br>
+The goal of the framework is to provide easy and controllable threads execution environmet.
 
 <h2>Motivation</h2>
 - Developers tend to create countles Executors ("Wild Executors") or Threads/Timers ("Wild Threads") all over the application witout proper configurations and documentations. Later we find ourselfs reviewing thread dumps where thread names means nothing to us and their amount is not consistent.
@@ -13,8 +13,17 @@ The goal of the framework is to provide easy controllable threads executions.
 <h2 name="features">Features</h2>
 - Configurable Thread Pools
 - Pre/Pos Execution Hooks
+- Extensive statistics over the pools performance
+- JMX monitoring
+- Web-based monitoring UI (as a separate GWT project)
 
+<h2>Members:</h2>
+<b>Owner: </b>
+- Arman Gal
 
+<b>Contributors:</b>
+* Daniel Gubchanov
+* Erdoan Veliev
 
 
 
