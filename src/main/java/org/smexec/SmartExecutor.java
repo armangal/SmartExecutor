@@ -139,6 +139,9 @@ public class SmartExecutor {
         if (tns != null) {
             return tns.threadNameSuffix();
         }
+        if (some instanceof IThreadNameSuffixAware) {
+            return ((IThreadNameSuffixAware) some).getThreadNameSuffix();
+        }
         return null;
     }
 
