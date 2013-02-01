@@ -22,7 +22,7 @@ The goal of the framework is to provide easy and controllable threads execution 
 - Arman Gal
 
 <b>Contributors:</b>
-* Daniel Gubchanov
+* Daniel Gyupchanov
 * Erdoan Veliev
 
 
