@@ -15,83 +15,40 @@
 package org.smexec.pool.impl;
 
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.SynchronousQueue;
-import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.smexec.configuration.PoolConfiguration;
+import org.smexec.configuration.PoolType;
 import org.smexec.pool.ISmartThreadPool;
-import org.smexec.wrappers.SmartCallable;
-import org.smexec.wrappers.SmartRunnable;
 
 public class SmartThreadPool
-    extends AbstractSmartPool
+    extends AbstractSmartPool<ThreadPoolExecutor>
     implements ISmartThreadPool {
 
-    private final ThreadPoolExecutor pool;
-
-    public SmartThreadPool(final PoolConfiguration poolConfiguration) {
-        super(poolConfiguration);
+    public SmartThreadPool(final PoolConfiguration poolConf) {
+        super(poolConf);
 
         final BlockingQueue<Runnable> workQueue;
 
-        if (poolConfiguration.getQueueSize() == -1) {
+        if (poolConf.getQueueSize() == -1 || poolConf.getPoolType().equals(PoolType.cached)) {
             workQueue = new SynchronousQueue<Runnable>();
         } else {
-            workQueue = new LinkedBlockingQueue<Runnable>(poolConfiguration.getQueueSize());
+            workQueue = new LinkedBlockingQueue<Runnable>(poolConf.getQueueSize());
 
         }
+        final int corePollSize = poolConf.getPoolType().equals(PoolType.regular) ? poolConf.getCorePollSize() : 0;
 
-        pool = new ThreadPoolExecutor(poolConfiguration.getCorePollSize(),
-                                      poolConfiguration.getMaxPoolSize(),
-                                      poolConfiguration.getKeepAliveTime(),
-                                      TimeUnit.MILLISECONDS,
-                                      workQueue,
-                                      new ThreadFactory() {
+        final int maxPoolSize = poolConf.getPoolType().equals(PoolType.regular) ? poolConf.getMaxPoolSize() : Integer.MAX_VALUE;
 
-                                          protected final AtomicInteger threadNumber = new AtomicInteger(0);
+        pool = new ThreadPoolExecutor(corePollSize, maxPoolSize, poolConf.getKeepAliveTime(), TimeUnit.MILLISECONDS, workQueue, threadFactory);
 
-                                          @Override
-                                          public Thread newThread(final Runnable r) {
-                                              // SER means SmartExecutorRegular pool
-                                              return new Thread(r, "SER_" + poolConfiguration.getPoolNameShort() + "_" + threadNumber.incrementAndGet());
-                                          }
-                                      });
-
-    }
-
-    public void execute(SmartRunnable command) {
-        try {
-            poolStats.incrementSubmitted();
-            pool.execute(command);
-        } catch (RejectedExecutionException e) {
-            poolStats.incrementRejected();
-            throw e;
-        }
-    }
-
-    public <T> Future<T> submit(SmartCallable<T> task) {
-        try {
-            poolStats.incrementSubmitted();
-            return pool.submit(task);
-        } catch (RejectedExecutionException e) {
-            poolStats.incrementRejected();
-            throw e;
-        }
-    }
-
-    @Override
-    public void shutdown() {
-        pool.shutdown();
     }
 
     @Override
     public String toString() {
-        return "SmartThreadPool [" + poolConfiguration + "] " + super.toString();
+        return "SmartThreadPool " + super.toString();
     }
 }

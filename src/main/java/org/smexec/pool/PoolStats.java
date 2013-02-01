@@ -29,9 +29,19 @@ public class PoolStats {
         return totalData.getSubmitted().incrementAndGet();
     }
 
+    public long incrementSubmitted(long delta) {
+        getCurrentChunk().getSubmitted().addAndGet(delta);
+        return totalData.getSubmitted().addAndGet(delta);
+    }
+
     public long incrementRejected() {
         getCurrentChunk().getRejected().incrementAndGet();
         return totalData.getRejected().incrementAndGet();
+    }
+
+    public long incrementRejected(long delta) {
+        getCurrentChunk().getRejected().addAndGet(delta);
+        return totalData.getRejected().addAndGet(delta);
     }
 
     public long incrementExecuted() {

@@ -10,13 +10,13 @@ public class PoolConfiguration {
 
     private String poolName;
     private String poolNameShort;
-    private Integer corePollSize;
-    private Integer maxPoolSize;
-    private Integer queueSize;
-    private Long keepAliveTime;
-    private PoolType poolType;
-    private int chunks;
-    private long chunkInterval;
+    private Integer corePollSize = 5;
+    private Integer maxPoolSize = 5;
+    private Integer queueSize = -1;
+    private Long keepAliveTime = 60000l;
+    private PoolType poolType = PoolType.regular;
+    private int chunks = 100;
+    private long chunkInterval = 10000;
 
     PoolConfiguration() {}
 

@@ -1,23 +1,26 @@
 package org.smexec.pool;
 
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
 import org.smexec.configuration.PoolConfiguration;
-import org.smexec.wrappers.SmartCallable;
-import org.smexec.wrappers.SmartRunnable;
 
-public interface ISmartThreadPool {
+public interface ISmartThreadPool
+    extends ExecutorService {
 
-    void execute(SmartRunnable command);
-
-    <T> Future<T> submit(SmartCallable<T> task);
-    
-    void shutdown();
-    
     PoolStats getPoolStats();
-    
+
     String getPoolName();
-    
+
     PoolConfiguration getPoolConfiguration();
+
+    void execute(Runnable command, String threadNameSuffix);
+
+    <T> Future<T> submit(Callable<T> task, String threadNameSuffix);
+
+    <T> Future<T> submit(Runnable task, T result, String threadNameSuffix);
+
+    Future<?> submit(Runnable task, String threadNameSuffix);
 
 }
