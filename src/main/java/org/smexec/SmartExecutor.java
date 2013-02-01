@@ -31,10 +31,12 @@ import javax.xml.bind.JAXBException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.smexec.annotation.ThreadNameSuffix;
 import org.smexec.annotation.ThreadPoolName;
 import org.smexec.configuration.Config;
 import org.smexec.configuration.PoolConfiguration;
 import org.smexec.jmx.ExecutorStats;
+import org.smexec.jmx.ExecutorStatsMBean;
 import org.smexec.jmx.PoolStats;
 import org.smexec.pool.ISmartScheduledThreadPool;
 import org.smexec.pool.ISmartThreadPool;
@@ -78,23 +80,18 @@ public class SmartExecutor {
         config = (Config) context.createUnmarshaller().unmarshal(configXML);
 
         logger.info("Initilized SmartExecutor with properties:{}", config);
-        
+
         config.validate();
 
         this.mbs = ManagementFactory.getPlatformMBeanServer();
 
-        ExecutorStats es = new ExecutorStats(this);
-
         try {
+            ExecutorStatsMBean es = new ExecutorStats(this, config);
             mbs.registerMBean(es, new ObjectName("org.smexec:type=SmartExecutor,name=" + config.getExecutorConfiguration().getName()));
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-    }
-
-    public Config getConfig() {
-        return config;
     }
 
     public void execute(Runnable command, String poolName, String threadNameSuffix) {
@@ -103,11 +100,11 @@ public class SmartExecutor {
     }
 
     public void execute(Runnable command, String poolName) {
-        execute(command, poolName, null);
+        execute(command, poolName, getThreadNameSuffix(command));
     }
 
     public void execute(Runnable command) {
-        execute(command, getPoolName(command), null);
+        execute(command, getPoolName(command), getThreadNameSuffix(command));
     }
 
     public void execute(String threadNameSuffix, Runnable command) {
@@ -137,9 +134,17 @@ public class SmartExecutor {
         return defaultPoolName;
     }
 
+    private String getThreadNameSuffix(Object some) {
+        ThreadNameSuffix tns = some.getClass().getAnnotation(ThreadNameSuffix.class);
+        if (tns != null) {
+            return tns.threadNameSuffix();
+        }
+        return null;
+    }
+
     public <T> Future<T> submit(Callable<T> task, String poolName) {
         ISmartThreadPool smartThreadPool = getPool(poolName);
-        return smartThreadPool.submit(task);
+        return smartThreadPool.submit(task, getThreadNameSuffix(task));
     }
 
     public <T> Future<T> submit(Callable<T> task) {
