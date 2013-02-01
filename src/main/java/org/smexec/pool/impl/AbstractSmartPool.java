@@ -10,19 +10,22 @@ import org.smexec.pool.PoolStats;
 public abstract class AbstractSmartPool
     implements ISmartThreadPool {
 
-    protected final PoolStats poolStats = new PoolStats(100);
+    protected final PoolStats poolStats;
 
     protected PoolConfiguration poolConfiguration;
 
-    public AbstractSmartPool() {
-        Timer t = new Timer("chunker");
+    public AbstractSmartPool(final PoolConfiguration poolConfiguration) {
+        this.poolConfiguration = poolConfiguration;
+        this.poolStats = new PoolStats(poolConfiguration.getChunks());
+        
+        Timer t = new Timer("Chunker_" + poolConfiguration.getPoolNameShort());
         t.scheduleAtFixedRate(new TimerTask() {
 
             @Override
             public void run() {
                 poolStats.addChunk();
             }
-        }, 10000, 10000);
+        }, poolConfiguration.getChunkInterval(), poolConfiguration.getChunkInterval());
     }
 
     public PoolStats getPoolStats() {

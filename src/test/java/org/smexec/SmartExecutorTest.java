@@ -28,10 +28,6 @@ public class SmartExecutorTest {
 
         se.execute(command, PoolNamesTest.DEFAULT_POOL, "XXX");
 
-        se.execute(command, "Custom1");
-
-        se.execute(command, "Custom1", "CCC");
-
         se.scheduleAtFixedRate(new SEStatsPrinter(se), 5000l, 5000l, TimeUnit.MILLISECONDS, "Stats");
 
         se.scheduleAtFixedRate(command, 1000l, 1000l, TimeUnit.MILLISECONDS, "Scheduled2", "EverySecond");
@@ -51,16 +47,20 @@ public class SmartExecutorTest {
             se.execute(command, "Cached1", "Cached");
         }
 
-        
+        Random r = new Random();
+        double counter = 0;
         do {
-            Random random = new Random();
-            for (int k = 0; k < random.nextInt(10) + 5; k++) {
-                try {
-                    AnnotatedSleepingThread d = new AnnotatedSleepingThread(random.nextInt(1000));
-                    se.execute("SLP", d);
-                } catch (Exception e) {
-                    //
-                }
+            counter++;
+            try {
+                double sin = (1 + Math.cos(Math.PI + counter/ Math.PI)) / 2;
+                System.out.println(counter + "|" + sin);
+                AnnotatedSleepingThread d = new AnnotatedSleepingThread((long) Math.abs((1000 * sin)));
+                se.execute("SLP", d);
+
+                AnnotatedSleepingThread d1 = new AnnotatedSleepingThread(r.nextInt(1000));;
+                se.execute("SLP", d1);
+            } catch (Exception e) {
+                // e.printStackTrace();
             }
             Thread.sleep(1000l);
         } while (true);

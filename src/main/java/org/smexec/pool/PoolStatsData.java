@@ -56,7 +56,7 @@ public class PoolStatsData {
     }
 
     public Long getAvgTime() {
-        return (getExecuted().get() == 0 ? 0 : (getTotalTime().get() / getExecuted().get()));
+        return (getCompleted().get() == 0 ? 0 : (getTotalTime().get() / getCompleted().get()));
     }
 
 }

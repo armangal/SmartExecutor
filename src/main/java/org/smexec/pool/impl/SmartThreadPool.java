@@ -36,8 +36,7 @@ public class SmartThreadPool
     private final ThreadPoolExecutor pool;
 
     public SmartThreadPool(final PoolConfiguration poolConfiguration) {
-    	super();
-        this.poolConfiguration = poolConfiguration;
+        super(poolConfiguration);
 
         final BlockingQueue<Runnable> workQueue;
 

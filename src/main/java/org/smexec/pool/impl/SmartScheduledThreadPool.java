@@ -35,8 +35,7 @@ public class SmartScheduledThreadPool
     private final ScheduledExecutorService pool;
 
     public SmartScheduledThreadPool(final PoolConfiguration poolConfiguration) {
-    	super();
-        this.poolConfiguration = poolConfiguration;
+        super(poolConfiguration);
 
         pool = Executors.newScheduledThreadPool(poolConfiguration.getCorePollSize(), new ThreadFactory() {
 

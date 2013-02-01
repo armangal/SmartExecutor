@@ -27,6 +27,6 @@ public class SleepingThreadPoolAware
 
     @Override
     public String getPoolName() {
-        return "Custom1";
+        return "Default";
     }
 }

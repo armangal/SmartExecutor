@@ -33,8 +33,7 @@ public class SmartCachedThreadPool
     private final ExecutorService pool;
 
     public SmartCachedThreadPool(final PoolConfiguration poolConfiguration) {
-        super();
-    	this.poolConfiguration = poolConfiguration;
+        super(poolConfiguration);
 
         this.pool = Executors.newCachedThreadPool(new ThreadFactory() {
 

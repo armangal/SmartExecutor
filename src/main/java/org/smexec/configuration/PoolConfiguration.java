@@ -15,6 +15,8 @@ public class PoolConfiguration {
     private Integer queueSize;
     private Long keepAliveTime;
     private PoolType poolType;
+    private int chunks;
+    private long chunkInterval;
 
     PoolConfiguration() {}
 
@@ -74,24 +76,44 @@ public class PoolConfiguration {
         this.poolType = poolType;
     }
 
+    public int getChunks() {
+        return chunks;
+    }
+
+    public void setChunks(int chunks) {
+        this.chunks = chunks;
+    }
+
+    public long getChunkInterval() {
+        return chunkInterval;
+    }
+
+    public void setChunkInterval(long chunkInterval) {
+        this.chunkInterval = chunkInterval;
+    }
+
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append("PoolConfiguration [poolName=")
-               .append(poolName)
-               .append(", poolNameShort=")
-               .append(poolNameShort)
-               .append(", corePollSize=")
-               .append(corePollSize)
-               .append(", maxPoolSize=")
-               .append(maxPoolSize)
-               .append(", queueSize=")
-               .append(queueSize)
-               .append(", keepAliveTime=")
-               .append(keepAliveTime)
-               .append(", poolType=")
-               .append(poolType)
-               .append("]");
+        builder.append("PoolConfiguration [poolName=");
+        builder.append(poolName);
+        builder.append(", poolNameShort=");
+        builder.append(poolNameShort);
+        builder.append(", corePollSize=");
+        builder.append(corePollSize);
+        builder.append(", maxPoolSize=");
+        builder.append(maxPoolSize);
+        builder.append(", queueSize=");
+        builder.append(queueSize);
+        builder.append(", keepAliveTime=");
+        builder.append(keepAliveTime);
+        builder.append(", poolType=");
+        builder.append(poolType);
+        builder.append(", chunks=");
+        builder.append(chunks);
+        builder.append(", chunkInterval=");
+        builder.append(chunkInterval);
+        builder.append("]");
         return builder.toString();
     }
 
@@ -99,6 +121,8 @@ public class PoolConfiguration {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
+        result = prime * result + (int) (chunkInterval ^ (chunkInterval >>> 32));
+        result = prime * result + chunks;
         result = prime * result + ((corePollSize == null) ? 0 : corePollSize.hashCode());
         result = prime * result + ((keepAliveTime == null) ? 0 : keepAliveTime.hashCode());
         result = prime * result + ((maxPoolSize == null) ? 0 : maxPoolSize.hashCode());
@@ -118,6 +142,10 @@ public class PoolConfiguration {
         if (getClass() != obj.getClass())
             return false;
         PoolConfiguration other = (PoolConfiguration) obj;
+        if (chunkInterval != other.chunkInterval)
+            return false;
+        if (chunks != other.chunks)
+            return false;
         if (corePollSize == null) {
             if (other.corePollSize != null)
                 return false;
