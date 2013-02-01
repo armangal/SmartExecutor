@@ -1,25 +1,28 @@
 package org.smexec.jmx;
 
 import org.smexec.SmartExecutor;
+import org.smexec.configuration.Config;
 
 public class ExecutorStats
     implements ExecutorStatsMBean {
 
-    private SmartExecutor smartExecutor;
+    private final SmartExecutor smartExecutor;
+    private final Config config;
 
-    public ExecutorStats(SmartExecutor smartExecutor) {
+    public ExecutorStats(SmartExecutor smartExecutor, Config config) {
         super();
         this.smartExecutor = smartExecutor;
+        this.config = config;
     }
 
     @Override
     public String getName() {
-        return smartExecutor.getConfig().getExecutorConfiguration().getName();
+        return config.getExecutorConfiguration().getName();
     }
 
     @Override
     public String getDescription() {
-        return smartExecutor.getConfig().getExecutorConfiguration().getDescription();
+        return config.getExecutorConfiguration().getDescription();
     }
 
     @Override

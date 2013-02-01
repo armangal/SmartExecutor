@@ -1,8 +1,10 @@
 package org.smexec.run;
 
+import org.smexec.annotation.ThreadNameSuffix;
 import org.smexec.annotation.ThreadPoolName;
 
 @ThreadPoolName(poolName = "Custom1")
+@ThreadNameSuffix(threadNameSuffix= "AST")
 public class AnnotatedSleepingThread
     implements Runnable {
 

@@ -55,10 +55,10 @@ public class SmartExecutorTest {
                 double sin = (1 + Math.cos(Math.PI + counter/ Math.PI)) / 2;
                 System.out.println(counter + "|" + sin);
                 AnnotatedSleepingThread d = new AnnotatedSleepingThread((long) Math.abs((1000 * sin)));
-                se.execute("SLP", d);
+                se.execute(d);
 
                 AnnotatedSleepingThread d1 = new AnnotatedSleepingThread(r.nextInt(1000));;
-                se.execute("SLP", d1);
+                se.execute(d1);
             } catch (Exception e) {
                 // e.printStackTrace();
             }
