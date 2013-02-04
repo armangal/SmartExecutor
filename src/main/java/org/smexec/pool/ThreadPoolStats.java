@@ -2,13 +2,13 @@ package org.smexec.pool;
 
 import java.util.LinkedList;
 
-public class PoolStats {
+public class ThreadPoolStats {
 
     private final PoolStatsData totalData = new PoolStatsData();
     private final int chunks;
     private LinkedList<PoolStatsData> history = new LinkedList<PoolStatsData>();
 
-    public PoolStats(final int chunks) {
+    public ThreadPoolStats(final int chunks) {
         this.chunks = chunks;
         history.add(new PoolStatsData());
     }

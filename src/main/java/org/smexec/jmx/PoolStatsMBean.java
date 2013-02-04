@@ -1,26 +1,48 @@
 package org.smexec.jmx;
 
-
 public interface PoolStatsMBean {
-	void printStats();
 
-	Long getSubmitted();
+    void printStats();
 
-	Long getExecuted();
+    Long getSubmitted();
 
-	Long getCompleted();
+    Long getExecuted();
 
-	Long getRejected();
+    Long getCompleted();
 
-	Long getFailed();
+    Long getRejected();
 
-	Long getMinTime();
+    Long getFailed();
 
-	Long getMaxTime();
+    Long getMinTime();
 
-	Long getTotalTime();
+    Long getMaxTime();
 
-	Long getAvgTime();
-	
-	String getChunks();
+    Long getTotalTime();
+
+    Long getAvgTime();
+
+    String getChunks();
+
+    /**
+     * Returns the current number of threads in the pool.
+     * 
+     * @return the number of threads
+     */
+    int getPoolSize();
+
+    /**
+     * Returns the approximate number of threads that are actively executing tasks.
+     * 
+     * @return the number of threads
+     */
+    int getActiveCount();
+
+    /**
+     * Returns the largest number of threads that have ever simultaneously been in the pool.
+     * 
+     * @return the number of threads
+     */
+    int getLargestPoolSize();
+
 }

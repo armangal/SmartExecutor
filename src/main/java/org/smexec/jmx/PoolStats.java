@@ -1,18 +1,21 @@
 package org.smexec.jmx;
 
-import org.smexec.pool.ISmartThreadPool;
+import java.util.concurrent.ThreadPoolExecutor;
+
+import org.smexec.pool.IGeneralThreadPool;
 import org.smexec.pool.PoolStatsData;
 
 public class PoolStats
     implements PoolStatsMBean {
 
-    private final ISmartThreadPool stp;
+    private final IGeneralThreadPool stp;
 
-    public PoolStats(final ISmartThreadPool stp) {
+    public PoolStats(final IGeneralThreadPool stp) {
         this.stp = stp;
     }
 
     @Override
+    // TODO ???
     public void printStats() {
         System.out.println(stp.getPoolStats().toString());
     }
@@ -78,5 +81,20 @@ public class PoolStats
         }
 
         return builder.toString();
+    }
+
+    @Override
+    public int getPoolSize() {
+        return ((ThreadPoolExecutor) stp).getPoolSize();
+    }
+
+    @Override
+    public int getActiveCount() {
+        return ((ThreadPoolExecutor) stp).getActiveCount();
+    }
+
+    @Override
+    public int getLargestPoolSize() {
+        return ((ThreadPoolExecutor) stp).getLargestPoolSize();
     }
 }

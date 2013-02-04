@@ -6,7 +6,7 @@ import javax.xml.bind.annotation.XmlElement;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.smexec.pool.PoolStats;
+import org.smexec.pool.ThreadPoolStats;
 
 /**
  * A wrapper Callable for internal usage. <br>
@@ -19,16 +19,11 @@ public class SmartCallable<V>
 
     private Callable<V> callable;
     private String threadNameSuffix;
-    private PoolStats poolStats;
+    private ThreadPoolStats poolStats;
 
-    public SmartCallable(Callable<V> callable, String threadNameSuffix, PoolStats poolStats) {
+    public SmartCallable(Callable<V> callable, String threadNameSuffix, ThreadPoolStats poolStats) {
         this.callable = callable;
         this.threadNameSuffix = threadNameSuffix;
-        this.poolStats = poolStats;
-    }
-
-    public SmartCallable(Callable<V> callable, PoolStats poolStats) {
-        this.callable = callable;
         this.poolStats = poolStats;
     }
 

@@ -2,7 +2,7 @@ package org.smexec.wrappers;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.smexec.pool.PoolStats;
+import org.smexec.pool.ThreadPoolStats;
 
 /**
  * A wrapper Runnable for internal usage. <br>
@@ -15,16 +15,11 @@ public class SmartRunnable
 
     private Runnable runnable;
     private String threadNameSuffix;
-    private PoolStats poolStats;
+    private ThreadPoolStats poolStats;
 
-    public SmartRunnable(Runnable runnable, String threadNameSuffix, PoolStats poolStats) {
+    public SmartRunnable(Runnable runnable, String threadNameSuffix, ThreadPoolStats poolStats) {
         this.runnable = runnable;
         this.threadNameSuffix = threadNameSuffix;
-        this.poolStats = poolStats;
-    }
-
-    public SmartRunnable(Runnable runnable, PoolStats poolStats) {
-        this.runnable = runnable;
         this.poolStats = poolStats;
     }
 

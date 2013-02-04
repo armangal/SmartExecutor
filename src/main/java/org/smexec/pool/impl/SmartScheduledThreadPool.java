@@ -15,36 +15,46 @@
 package org.smexec.pool.impl;
 
 import java.util.concurrent.Callable;
-import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.smexec.configuration.PoolConfiguration;
 import org.smexec.pool.ISmartScheduledThreadPool;
+import org.smexec.pool.ThreadPoolStats;
 
 public class SmartScheduledThreadPool
-    extends AbstractSmartPool<ScheduledExecutorService>
+    extends ScheduledThreadPoolExecutor
     implements ISmartScheduledThreadPool {
 
-    public SmartScheduledThreadPool(final PoolConfiguration poolConfiguration) {
-        super(poolConfiguration);
+    protected final ThreadPoolStats poolStats;
 
-        pool = Executors.newScheduledThreadPool(poolConfiguration.getCorePollSize(), new ThreadFactory() {
+    protected final PoolConfiguration poolConf;
+
+    public SmartScheduledThreadPool(final PoolConfiguration poolConf) {
+        super(poolConf.getCorePollSize(), new ThreadFactory() {
 
             protected final AtomicInteger threadNumber = new AtomicInteger(0);
 
             @Override
             public Thread newThread(Runnable r) {
-                // SESR means SmartExecutorScheduled pool
-                return new Thread(r, "SES_" + poolConfiguration.getPoolNameShort() + "_" + threadNumber.incrementAndGet());
+                return new Thread(r, poolConf.getPoolType().getThreadNamePrefix() + poolConf.getPoolNameShort() + "_" + threadNumber.incrementAndGet());
             }
         });
 
+        this.poolConf = poolConf;
+        this.poolStats = new ThreadPoolStats(poolConf.getChunks());
+
+        // Schedule custom chunker thread
+        ThreadPoolHelper.scheduleChunker(poolConf, poolStats);
+
     }
+
+    @Override
+    protected void afterExecute(Runnable r, Throwable t) {}
 
     @Override
     public ScheduledFuture<?> schedule(Runnable command, long delay, TimeUnit unit) {
@@ -55,7 +65,7 @@ public class SmartScheduledThreadPool
     public ScheduledFuture<?> schedule(Runnable command, long delay, TimeUnit unit, String threadNameSuffix) {
         try {
             poolStats.incrementSubmitted();
-            return pool.schedule(wrapRunnble(command, threadNameSuffix), delay, unit);
+            return super.schedule(ThreadPoolHelper.wrapRunnble(command, threadNameSuffix, poolStats), delay, unit);
         } catch (RejectedExecutionException e) {
             poolStats.incrementRejected();
             throw e;
@@ -71,7 +81,7 @@ public class SmartScheduledThreadPool
     public <V> ScheduledFuture<V> schedule(Callable<V> callable, long delay, TimeUnit unit, String threadNameSuffix) {
         try {
             poolStats.incrementSubmitted();
-            return pool.schedule(wrapCallable(callable, threadNameSuffix), delay, unit);
+            return super.schedule(ThreadPoolHelper.wrapCallable(callable, threadNameSuffix, poolStats), delay, unit);
         } catch (RejectedExecutionException e) {
             poolStats.incrementRejected();
             throw e;
@@ -87,7 +97,7 @@ public class SmartScheduledThreadPool
     public ScheduledFuture<?> scheduleAtFixedRate(Runnable command, long initialDelay, long period, TimeUnit unit, String threadNameSuffix) {
         try {
             poolStats.incrementSubmitted();
-            return pool.scheduleAtFixedRate(wrapRunnble(command, threadNameSuffix), initialDelay, period, unit);
+            return super.scheduleAtFixedRate(ThreadPoolHelper.wrapRunnble(command, threadNameSuffix, poolStats), initialDelay, period, unit);
         } catch (RejectedExecutionException e) {
             poolStats.incrementRejected();
             throw e;
@@ -103,7 +113,7 @@ public class SmartScheduledThreadPool
     public ScheduledFuture<?> scheduleWithFixedDelay(Runnable command, long initialDelay, long delay, TimeUnit unit, String threadNameSuffix) {
         try {
             poolStats.incrementSubmitted();
-            return pool.scheduleWithFixedDelay(wrapRunnble(command, threadNameSuffix), initialDelay, delay, unit);
+            return super.scheduleWithFixedDelay(ThreadPoolHelper.wrapRunnble(command, threadNameSuffix, poolStats), initialDelay, delay, unit);
         } catch (RejectedExecutionException e) {
             poolStats.incrementRejected();
             throw e;
@@ -112,7 +122,17 @@ public class SmartScheduledThreadPool
 
     @Override
     public String toString() {
-        return "SmartScheduledThreadPool " + super.toString();
+        return "SmartScheduledThreadPool Pool:[" + super.toString() + "]\nStats:[" + poolStats + "]\nConf:[" + poolConf + "]";
+    }
+
+    @Override
+    public ThreadPoolStats getPoolStats() {
+        return poolStats;
+    }
+
+    @Override
+    public PoolConfiguration getPoolConfiguration() {
+        return poolConf;
     }
 
 }

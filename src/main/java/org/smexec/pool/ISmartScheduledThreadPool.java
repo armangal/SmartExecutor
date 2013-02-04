@@ -6,7 +6,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 public interface ISmartScheduledThreadPool
-    extends ScheduledExecutorService {
+    extends ScheduledExecutorService, IGeneralThreadPool {
 
     ScheduledFuture<?> schedule(Runnable command, long delay, TimeUnit unit, String threadNameSuffix);
 
