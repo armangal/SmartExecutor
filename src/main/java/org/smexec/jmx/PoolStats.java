@@ -74,10 +74,30 @@ public class PoolStats
     }
 
     @Override
-    public String getChunks() {
+    public String getTimeChunks() {
         StringBuilder builder = new StringBuilder();
         for (PoolStatsData h : stp.getPoolStats().getHistory()) {
             builder.append("[").append(h.getMaxTimeLong()).append(",").append(h.getAvgTime()).append(",").append(h.getMinTimeLong()).append("]");
+        }
+
+        return builder.toString();
+    }
+
+    @Override
+    public String getTasksChunks() {
+        StringBuilder builder = new StringBuilder();
+        for (PoolStatsData h : stp.getPoolStats().getHistory()) {
+            builder.append("[")
+                   .append(h.getSubmitted())
+                   .append(",")
+                   .append(h.getExecuted())
+                   .append(",")
+                   .append(h.getFailed())
+                   .append(",")
+                   .append(h.getRejected())
+                   .append(",")
+                   .append(h.getCompleted())
+                   .append("]");
         }
 
         return builder.toString();

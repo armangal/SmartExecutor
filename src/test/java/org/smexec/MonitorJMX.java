@@ -53,7 +53,7 @@ public class MonitorJMX {
                 System.out.println(mbsc.getAttribute(on.getObjectName(), "ActiveCount"));
                 PoolStatsMBean proxy = JMX.newMBeanProxy(mbsc, on.getObjectName(), PoolStatsMBean.class);
 
-                System.out.println(proxy.getChunks());
+                System.out.println(proxy.getTimeChunks());
             }
         }
         

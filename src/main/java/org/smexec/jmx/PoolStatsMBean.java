@@ -22,7 +22,9 @@ public interface PoolStatsMBean {
 
     Long getAvgTime();
 
-    String getChunks();
+    String getTimeChunks();
+    
+    String getTasksChunks();
 
     /**
      * Returns the current number of threads in the pool.
