@@ -28,7 +28,19 @@
 				<chunks>100</chunks>
 				<chunkInterval>2000</chunkInterval>
 			</pool>
-
+			
+			<pool>
+				<poolName>Fast</poolName>
+				<poolNameShort>FST</poolNameShort>
+				<corePollSize>2</corePollSize>
+				<maxPoolSize>2</maxPoolSize>
+				<queueSize>100</queueSize>
+				<keepAliveTime>1000</keepAliveTime>
+				<poolType>regular</poolType>
+				<chunks>100</chunks>
+				<chunkInterval>2000</chunkInterval>
+			</pool>
+			
 			<pool>
 				<poolName>Scheduled</poolName>
 				<poolNameShort>STP1</poolNameShort>

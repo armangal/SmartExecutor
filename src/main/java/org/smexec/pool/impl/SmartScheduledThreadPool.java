@@ -18,9 +18,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.smexec.configuration.PoolConfiguration;
 import org.smexec.pool.ISmartScheduledThreadPool;
@@ -35,15 +33,7 @@ public class SmartScheduledThreadPool
     protected final PoolConfiguration poolConf;
 
     public SmartScheduledThreadPool(final PoolConfiguration poolConf) {
-        super(poolConf.getCorePollSize(), new ThreadFactory() {
-
-            protected final AtomicInteger threadNumber = new AtomicInteger(0);
-
-            @Override
-            public Thread newThread(Runnable r) {
-                return new Thread(r, poolConf.getPoolType().getThreadNamePrefix() + poolConf.getPoolNameShort() + "_" + threadNumber.incrementAndGet());
-            }
-        });
+        super(poolConf.getCorePollSize(), ThreadPoolHelper.getThreadFactory(poolConf));
 
         this.poolConf = poolConf;
         this.poolStats = new ThreadPoolStats(poolConf.getChunks());

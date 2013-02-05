@@ -45,7 +45,7 @@ public class SmartThreadPool
               poolConf.getKeepAliveTime(),
               TimeUnit.MILLISECONDS,
               (poolConf.getQueueSize() == -1 || poolConf.getPoolType().equals(PoolType.cached)) ? new SynchronousQueue<Runnable>()
-                              : new LinkedBlockingQueue<Runnable>(poolConf.getQueueSize()));
+                              : new LinkedBlockingQueue<Runnable>(poolConf.getQueueSize()), ThreadPoolHelper.getThreadFactory(poolConf));
 
         this.poolConf = poolConf;
         this.poolStats = new ThreadPoolStats(poolConf.getChunks());

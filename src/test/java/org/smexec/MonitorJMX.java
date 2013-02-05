@@ -5,9 +5,11 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.management.AttributeNotFoundException;
 import javax.management.InstanceNotFoundException;
 import javax.management.IntrospectionException;
 import javax.management.JMX;
+import javax.management.MBeanException;
 import javax.management.MBeanServerConnection;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectInstance;
@@ -28,9 +30,11 @@ public class MonitorJMX {
      * @throws MalformedObjectNameException
      * @throws IntrospectionException
      * @throws InstanceNotFoundException
+     * @throws MBeanException 
+     * @throws AttributeNotFoundException 
      */
     public static void main(String[] args)
-        throws IOException, InstanceNotFoundException, IntrospectionException, MalformedObjectNameException, ReflectionException, NullPointerException {
+        throws IOException, InstanceNotFoundException, IntrospectionException, MalformedObjectNameException, ReflectionException, NullPointerException, MBeanException, AttributeNotFoundException {
         JMXServiceURL u = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://localhost:9010/jmxrmi");
         JMXConnector c = JMXConnectorFactory.connect(u);
 
@@ -46,6 +50,7 @@ public class MonitorJMX {
         for (ObjectInstance on : names) {
             if ("SmartExecutor.Pools".equals(on.getObjectName().getKeyProperty("type"))) {
                 System.out.println(on.getObjectName().getKeyProperty("name"));
+                System.out.println(mbsc.getAttribute(on.getObjectName(), "ActiveCount"));
                 PoolStatsMBean proxy = JMX.newMBeanProxy(mbsc, on.getObjectName(), PoolStatsMBean.class);
 
                 System.out.println(proxy.getChunks());
