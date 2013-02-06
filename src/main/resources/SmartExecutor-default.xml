@@ -1,25 +1,38 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <SmartExecutor xmlns:ns2="http://www.armangal.com/smartexecutor/v1">
-	<pools>
-		<pool>
-			<poolName>Default</poolName>
-			<poolNameShort>DTP</poolNameShort>
-			<corePollSize>2</corePollSize>
-			<maxPoolSize>3</maxPoolSize>
-			<queueSize>100</queueSize>
-			<keepAliveTime>1000</keepAliveTime>
-			<poolType>regular</poolType>
-		</pool>
-		<pool>
-			<poolName>Scheduled</poolName>
-			<poolNameShort>STP</poolNameShort>
-			<corePollSize>5</corePollSize>
-			<poolType>scheduled</poolType>
-		</pool>
-		<pool>
-			<poolName>Cached</poolName>
-			<poolNameShort>CTP</poolNameShort>
-			<poolType>cached</poolType>
-		</pool>
-	</pools>
+
+	<executor>
+		<name>Default Executor</name>
+		<description>Default Executor used in the system</description>
+		<pools>
+			<pool>
+				<poolName>Default</poolName>
+				<poolNameShort>DTP</poolNameShort>
+				<corePollSize>2</corePollSize>
+				<maxPoolSize>3</maxPoolSize>
+				<queueSize>100</queueSize>
+				<keepAliveTime>1000</keepAliveTime>
+				<poolType>regular</poolType>
+				<chunks>100</chunks>
+				<chunkInterval>10000</chunkInterval>
+			</pool>
+
+			<pool>
+				<poolName>Scheduled</poolName>
+				<poolNameShort>STP</poolNameShort>
+				<corePollSize>5</corePollSize>
+				<poolType>scheduled</poolType>
+				<chunks>100</chunks>
+				<chunkInterval>10000</chunkInterval>
+			</pool>
+
+			<pool>
+				<poolName>Cached</poolName>
+				<poolNameShort>CTP</poolNameShort>
+				<poolType>cached</poolType>
+				<chunks>100</chunks>
+				<chunkInterval>10000</chunkInterval>
+			</pool>
+		</pools>
+	</executor>
 </SmartExecutor>
