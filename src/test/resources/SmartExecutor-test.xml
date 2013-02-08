@@ -13,7 +13,7 @@
 				<queueSize>100</queueSize>
 				<keepAliveTime>1000</keepAliveTime>
 				<poolType>regular</poolType>
-				<chunks>100</chunks>
+				<chunks>10</chunks>
 				<chunkInterval>10000</chunkInterval>
 			</pool>
 
@@ -25,8 +25,8 @@
 				<queueSize>10</queueSize>
 				<keepAliveTime>1000</keepAliveTime>
 				<poolType>regular</poolType>
-				<chunks>100</chunks>
-				<chunkInterval>2000</chunkInterval>
+				<chunks>10</chunks>
+				<chunkInterval>10000</chunkInterval>
 			</pool>
 			
 			<pool>
@@ -37,8 +37,8 @@
 				<queueSize>100</queueSize>
 				<keepAliveTime>1000</keepAliveTime>
 				<poolType>regular</poolType>
-				<chunks>100</chunks>
-				<chunkInterval>2000</chunkInterval>
+				<chunks>10</chunks>
+				<chunkInterval>10000</chunkInterval>
 			</pool>
 			
 			<pool>
@@ -46,7 +46,7 @@
 				<poolNameShort>STP1</poolNameShort>
 				<corePollSize>5</corePollSize>
 				<poolType>scheduled</poolType>
-				<chunks>100</chunks>
+				<chunks>10</chunks>
 				<chunkInterval>10000</chunkInterval>
 			</pool>
 
@@ -55,14 +55,14 @@
 				<poolNameShort>STP2</poolNameShort>
 				<corePollSize>5</corePollSize>
 				<poolType>scheduled</poolType>
-				<chunks>100</chunks>
+				<chunks>10</chunks>
 				<chunkInterval>10000</chunkInterval>
 			</pool>
 			<pool>
 				<poolName>Cached1</poolName>
 				<poolNameShort>CTP</poolNameShort>
 				<poolType>cached</poolType>
-				<chunks>100</chunks>
+				<chunks>10</chunks>
 				<chunkInterval>10000</chunkInterval>
 			</pool>
 		</pools>
