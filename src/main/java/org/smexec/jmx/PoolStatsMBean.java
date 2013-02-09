@@ -1,5 +1,6 @@
 package org.smexec.jmx;
 
+
 public interface PoolStatsMBean {
 
     void printStats();
@@ -46,5 +47,5 @@ public interface PoolStatsMBean {
      * @return the number of threads
      */
     int getLargestPoolSize();
-
+    
 }

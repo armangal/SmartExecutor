@@ -3,8 +3,6 @@ package org.smexec.jmx;
 import java.util.LinkedList;
 import java.util.concurrent.ThreadPoolExecutor;
 
-import javax.management.openmbean.CompositeData;
-
 import org.smexec.pool.IGeneralThreadPool;
 import org.smexec.pool.PoolStatsData;
 
@@ -123,11 +121,6 @@ public class PoolStats
     @Override
     public int getLargestPoolSize() {
         return ((ThreadPoolExecutor) stp).getLargestPoolSize();
-    }
-
-    @Override
-    public CompositeData getData() {
-        return null;
     }
 
 }
