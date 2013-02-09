@@ -9,7 +9,7 @@ public class ThreadPoolStats {
     private LinkedList<PoolStatsData> history = new LinkedList<PoolStatsData>();
 
     public ThreadPoolStats(final int chunks) {
-        this.chunks = chunks;
+        this.chunks = chunks + 1;
         history.add(new PoolStatsData());
     }
 

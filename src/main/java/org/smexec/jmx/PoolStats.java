@@ -1,6 +1,9 @@
 package org.smexec.jmx;
 
+import java.util.LinkedList;
 import java.util.concurrent.ThreadPoolExecutor;
+
+import javax.management.openmbean.CompositeData;
 
 import org.smexec.pool.IGeneralThreadPool;
 import org.smexec.pool.PoolStatsData;
@@ -76,7 +79,9 @@ public class PoolStats
     @Override
     public String getTimeChunks() {
         StringBuilder builder = new StringBuilder();
-        for (PoolStatsData h : stp.getPoolStats().getHistory()) {
+        LinkedList<PoolStatsData> history = stp.getPoolStats().getHistory();
+        for (int i = 0; i < (history.size() - 1); i++) {
+            PoolStatsData h = history.get(i);
             builder.append("[").append(h.getMaxTimeLong()).append(",").append(h.getAvgTime()).append(",").append(h.getMinTimeLong()).append("]");
         }
 
@@ -86,7 +91,9 @@ public class PoolStats
     @Override
     public String getTasksChunks() {
         StringBuilder builder = new StringBuilder();
-        for (PoolStatsData h : stp.getPoolStats().getHistory()) {
+        LinkedList<PoolStatsData> history = stp.getPoolStats().getHistory();
+        for (int i = 0; i < (history.size() - 1); i++) {
+            PoolStatsData h = history.get(i);
             builder.append("[")
                    .append(h.getSubmitted())
                    .append(",")
@@ -117,4 +124,10 @@ public class PoolStats
     public int getLargestPoolSize() {
         return ((ThreadPoolExecutor) stp).getLargestPoolSize();
     }
+
+    @Override
+    public CompositeData getData() {
+        return null;
+    }
+
 }
