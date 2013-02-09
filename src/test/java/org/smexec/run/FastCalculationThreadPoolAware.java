@@ -10,11 +10,16 @@ public class FastCalculationThreadPoolAware
     @Override
     public void run() {
         Random r = new Random();
-        double cos = Math.cos(r.nextDouble());
-        double cos1 = Math.cos(r.nextDouble());
-        if (cos1 == cos) {
-            System.err.println("WOW:" + cos);
+        int i;
+        for (i = 0; i < r.nextInt(1000)*100000; i++) {
+            double cos = Math.cos(r.nextDouble());
+            double cos1 = Math.cos(r.nextDouble());
+            double log = Math.log(r.nextDouble());
+            if (cos1 == cos) {
+                System.err.println("WOW:" + cos + log);
+            }
         }
+//        System.out.println(i);
     }
 
     @Override

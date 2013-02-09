@@ -1,6 +1,9 @@
 package org.smexec;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -71,6 +74,8 @@ public class SmartExecutorTest {
 
     }
 
+    static List<String> list = new ArrayList<String>();
+
     private static void killing(final SmartExecutor se) {
         new Thread(new Runnable() {
 
@@ -80,7 +85,9 @@ public class SmartExecutorTest {
                 do {
                     try {
                         se.execute("FAST", new FastCalculationThreadPoolAware());
-                        Thread.sleep(1L);
+                        for (int i = 0; i < 1; i++)
+                            list.add(Arrays.toString(Thread.currentThread().getStackTrace()));
+                        Thread.sleep(10L);
                     } catch (Exception e) {
 
                     }
