@@ -25,8 +25,8 @@
 				<queueSize>10</queueSize>
 				<keepAliveTime>1000</keepAliveTime>
 				<poolType>regular</poolType>
-				<chunks>10</chunks>
-				<chunkInterval>10000</chunkInterval>
+				<chunks>200</chunks>
+				<chunkInterval>100</chunkInterval>
 			</pool>
 			
 			<pool>
@@ -37,8 +37,8 @@
 				<queueSize>100</queueSize>
 				<keepAliveTime>1000</keepAliveTime>
 				<poolType>regular</poolType>
-				<chunks>10</chunks>
-				<chunkInterval>10000</chunkInterval>
+				<chunks>2000</chunks>
+				<chunkInterval>100</chunkInterval>
 			</pool>
 			
 			<pool>

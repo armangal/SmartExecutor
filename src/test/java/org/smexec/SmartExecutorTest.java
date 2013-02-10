@@ -69,7 +69,7 @@ public class SmartExecutorTest {
             } catch (Exception e) {
                 // e.printStackTrace();
             }
-            Thread.sleep(1000l);
+            Thread.sleep(100l);
         } while (true);
 
     }

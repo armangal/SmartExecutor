@@ -10,5 +10,5 @@
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="org.smexec.SmartExecutorTest"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="smartexecutor"/>
 <stringAttribute key="org.eclipse.jdt.launching.SOURCE_PATH_PROVIDER" value="org.eclipse.m2e.launchconfig.sourcepathProvider"/>
-<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Dcom.sun.management.jmxremote&#13;&#10;-Dcom.sun.management.jmxremote.port=9010&#13;&#10;-Dcom.sun.management.jmxremote.ssl=false&#13;&#10;-Dcom.sun.management.jmxremote.authenticate=false&#13;&#10;-XX:+PrintGCDetails &#13;&#10;-Xmx64m&#13;&#10;-XX:+UseConcMarkSweepGC"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Dcom.sun.management.jmxremote&#13;&#10;-Dcom.sun.management.jmxremote.port=9010&#13;&#10;-Dcom.sun.management.jmxremote.ssl=false&#13;&#10;-Dcom.sun.management.jmxremote.authenticate=true&#13;&#10;-Dcom.sun.management.jmxremote.access.file=C:\Users\armang\git\SmartExecutor\jmx\jmx.access&#13;&#10;-Dcom.sun.management.jmxremote.password.file=C:\Users\armang\git\SmartExecutor\jmx\jmx.password&#13;&#10;-XX:+PrintGCDetails &#13;&#10;-Xmx64m&#13;&#10;-XX:+UseConcMarkSweepGC"/>
 </launchConfiguration>

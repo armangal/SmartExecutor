@@ -1,0 +1,5 @@
+#-Dcom.sun.management.jmxremote.access.file=d:/jmx/jmx.access
+
+user readonly
+
+admin readwrite
