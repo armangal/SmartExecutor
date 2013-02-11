@@ -17,7 +17,7 @@ public class AnnotatedSleepingThread
 
     @Override
     public void run() {
-        System.out.println("AnnotatedSleepingThread, Sleeping with:" + delay + "[" + Thread.currentThread().getName() + "]");
+//        System.out.println("AnnotatedSleepingThread, Sleeping with:" + delay + "[" + Thread.currentThread().getName() + "]");
         if (delay % 10 == 0) {
             throw new RuntimeException("Just fail");
         }

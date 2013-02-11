@@ -1,6 +1,8 @@
 package org.smexec;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -37,6 +39,7 @@ public class SmartExecutorTest {
         se.scheduleAtFixedRate(command, 1000l, 1000l, TimeUnit.MILLISECONDS, "Scheduled2", "EverySecond");
 
         killing(se);
+        control(se);
 
         // check rejection
         int rejected = 0;
@@ -59,7 +62,7 @@ public class SmartExecutorTest {
             counter++;
             try {
                 double sin = (1 + Math.cos(Math.PI + counter / Math.PI)) / 2;
-                System.out.println(counter + "|" + sin);
+//                System.out.println(counter + "|" + sin);
                 AnnotatedSleepingThread d = new AnnotatedSleepingThread((long) Math.abs((1000 * sin)));
                 se.execute(d);
 
@@ -75,6 +78,7 @@ public class SmartExecutorTest {
     }
 
     static List<String> list = new ArrayList<String>();
+    static boolean work = true;
 
     private static void killing(final SmartExecutor se) {
         new Thread(new Runnable() {
@@ -85,11 +89,50 @@ public class SmartExecutorTest {
                 do {
                     try {
                         se.execute("FAST", new FastCalculationThreadPoolAware());
-                        for (int i = 0; i < 1; i++)
-                            list.add(Arrays.toString(Thread.currentThread().getStackTrace()));
+                        for (int i = 0; work && i < 2; i++)
+                            list.add(""+i+Arrays.toString(Thread.currentThread().getStackTrace()));
                         Thread.sleep(10L);
                     } catch (Exception e) {
 
+                    }
+                } while (true);
+            };
+        }).start();
+
+    }
+
+    private static void control(final SmartExecutor se) {
+        new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                Thread.currentThread().setName("CONTROL");
+                do {
+                    try {
+                        System.out.print("Enter command: ");
+
+                        // open up standard input
+                        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+
+                        String cmd = null;
+
+                        try {
+                            cmd = br.readLine();
+                            if ("1".equals(cmd)) {
+                                list.clear();
+                            }
+                            if ("2".equals(cmd)) {
+                                work = false;
+                            }
+                            if ("3".equals(cmd)) {
+                                work = true;
+                            }
+                        } catch (IOException ioe) {
+                            System.out.println("IO error trying to read your name!");
+                        }
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
                 } while (true);
             };

@@ -14,7 +14,7 @@ public class SleepingThreadPoolAware
 
     @Override
     public void run() {
-        System.out.println("SleepingThreadPoolAware, Sleeping with:" + delay + "[" + Thread.currentThread().getName() + "]");
+//        System.out.println("SleepingThreadPoolAware, Sleeping with:" + delay + "[" + Thread.currentThread().getName() + "]");
         if (delay % 10 == 0) {
             throw new RuntimeException("Just fail");
         }

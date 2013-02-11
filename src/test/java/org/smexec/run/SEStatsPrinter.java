@@ -17,6 +17,6 @@ public class SEStatsPrinter
 
     @Override
     public void run() {
-        System.out.println("print some stats");
+//        System.out.println("print some stats");
     }
 }
