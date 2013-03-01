@@ -48,4 +48,6 @@ public interface PoolStatsMBean {
      */
     int getLargestPoolSize();
     
+    String[] getTaskNames();
+    
 }

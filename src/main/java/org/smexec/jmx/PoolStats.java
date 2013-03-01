@@ -3,11 +3,15 @@ package org.smexec.jmx;
 import java.util.LinkedList;
 import java.util.concurrent.ThreadPoolExecutor;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.smexec.pool.IGeneralThreadPool;
 import org.smexec.pool.PoolStatsData;
 
 public class PoolStats
     implements PoolStatsMBean {
+
+    private static Logger logger = LoggerFactory.getLogger(PoolStats.class);
 
     private final IGeneralThreadPool stp;
 
@@ -16,9 +20,8 @@ public class PoolStats
     }
 
     @Override
-    // TODO ???
     public void printStats() {
-        System.out.println(stp.getPoolStats().toString());
+        logger.debug(stp.getPoolStats().toString());
     }
 
     @Override
@@ -121,6 +124,11 @@ public class PoolStats
     @Override
     public int getLargestPoolSize() {
         return ((ThreadPoolExecutor) stp).getLargestPoolSize();
+    }
+    
+    @Override
+    public String[] getTaskNames() {
+        return stp.getPoolStats().getTaskNames();
     }
 
 }

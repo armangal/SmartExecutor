@@ -14,6 +14,9 @@
  */
 package org.smexec;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.lang.management.ManagementFactory;
 import java.util.concurrent.Callable;
@@ -45,7 +48,8 @@ import org.smexec.pool.impl.SmartScheduledThreadPool;
 import org.smexec.pool.impl.SmartThreadPool;
 
 /**
- * The main entry point to use SmartExecutor
+ * The main entry point to use SmartExecutor framework.<br>
+ * It's possible to have many different instances of SmartExecutor
  */
 public class SmartExecutor {
 
@@ -61,17 +65,35 @@ public class SmartExecutor {
 
     private MBeanServer mbs;
 
+    /**
+     * Initializing SmartExecutor with default pools configurations.
+     * 
+     * @throws JAXBException
+     * @throws FileNotFoundException
+     */
     public SmartExecutor()
-        throws JAXBException {
+        throws JAXBException, FileNotFoundException {
         this(defaultXMLConfName);
     }
 
+    /**
+     * Initializing SmartExecutor with custom configuration file
+     * 
+     * @param configXMLresource, if the file is in classPath, then only name is enough, if the file is located
+     *            out of CP, full file path should be provided
+     * @throws JAXBException
+     * @throws FileNotFoundException
+     */
     public SmartExecutor(String configXMLresource)
-        throws JAXBException {
-        // TODO improve configuration loading API
+        throws JAXBException, FileNotFoundException {
         InputStream configXML = Thread.currentThread().getContextClassLoader().getResourceAsStream(configXMLresource);
         if (configXML == null) {
-            throw new RuntimeException("Configuration file wan't found:" + configXMLresource);
+            File f = new File(configXMLresource);
+            if (f.exists()) {
+                configXML = new FileInputStream(f);
+            } else {
+                throw new RuntimeException("Configuration file wan't found:" + configXMLresource);
+            }
         }
         JAXBContext context = JAXBContext.newInstance(Config.class);
         config = (Config) context.createUnmarshaller().unmarshal(configXML);
@@ -80,13 +102,15 @@ public class SmartExecutor {
 
         config.validate();
 
+        logger.info("Configurations have been validated.");
+
         this.mbs = ManagementFactory.getPlatformMBeanServer();
 
         try {
             ExecutorStatsMBean es = new ExecutorStats(this, config);
             mbs.registerMBean(es, new ObjectName("org.smexec:type=SmartExecutor,name=" + config.getExecutorConfiguration().getName()));
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         }
 
     }

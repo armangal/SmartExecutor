@@ -62,11 +62,12 @@ public class SmartThreadPool
 
     @Override
     public void execute(Runnable command, String threadNameSuffix) {
-        poolStats.incrementSubmitted();
+        String taskIdentification = ThreadPoolHelper.getTaskIdentification(command);
+        poolStats.incrementSubmitted(taskIdentification);
         try {
-            super.execute(ThreadPoolHelper.wrapRunnble(command, threadNameSuffix, poolStats));
+            super.execute(ThreadPoolHelper.wrapRunnble(command, taskIdentification, threadNameSuffix, poolStats));
         } catch (RejectedExecutionException e) {
-            poolStats.incrementRejected();
+            poolStats.incrementRejected(taskIdentification);
             throw e;
         }
     }
@@ -78,11 +79,12 @@ public class SmartThreadPool
 
     @Override
     public <T> Future<T> submit(Callable<T> task, String threadNameSuffix) {
+        String taskIdentification = ThreadPoolHelper.getTaskIdentification(task);
         try {
-            poolStats.incrementSubmitted();
-            return super.submit(ThreadPoolHelper.wrapCallable(task, threadNameSuffix, poolStats));
+            poolStats.incrementSubmitted(taskIdentification);
+            return super.submit(ThreadPoolHelper.wrapCallable(task, taskIdentification, threadNameSuffix, poolStats));
         } catch (RejectedExecutionException e) {
-            poolStats.incrementRejected();
+            poolStats.incrementRejected(taskIdentification);
             throw e;
         }
     }
@@ -94,11 +96,12 @@ public class SmartThreadPool
 
     @Override
     public Future<?> submit(Runnable task, String threadNameSuffix) {
-        poolStats.incrementSubmitted();
+        String taskIdentification = ThreadPoolHelper.getTaskIdentification(task);
+        poolStats.incrementSubmitted(taskIdentification);
         try {
-            return super.submit(ThreadPoolHelper.wrapRunnble(task, threadNameSuffix, poolStats));
+            return super.submit(ThreadPoolHelper.wrapRunnble(task, taskIdentification, threadNameSuffix, poolStats));
         } catch (RejectedExecutionException e) {
-            poolStats.incrementRejected();
+            poolStats.incrementRejected(taskIdentification);
             throw e;
         }
     }
@@ -110,11 +113,12 @@ public class SmartThreadPool
 
     @Override
     public <T> Future<T> submit(Runnable task, T result, String threadNameSuffix) {
-        poolStats.incrementSubmitted();
+        String taskIdentification = ThreadPoolHelper.getTaskIdentification(task);
+        poolStats.incrementSubmitted(taskIdentification);
         try {
-            return super.submit(ThreadPoolHelper.wrapRunnble(task, threadNameSuffix, poolStats), result);
+            return super.submit(ThreadPoolHelper.wrapRunnble(task, taskIdentification, threadNameSuffix, poolStats), result);
         } catch (RejectedExecutionException e) {
-            poolStats.incrementRejected();
+            poolStats.incrementRejected(taskIdentification);
             throw e;
         }
     }
