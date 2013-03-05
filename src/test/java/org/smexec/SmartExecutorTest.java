@@ -4,8 +4,10 @@ import static java.lang.management.ManagementFactory.getMemoryMXBean;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.management.MemoryMXBean;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -19,6 +21,7 @@ import javax.management.MalformedObjectNameException;
 import javax.management.NotCompliantMBeanException;
 import javax.xml.bind.JAXBException;
 
+import org.apache.log4j.xml.DOMConfigurator;
 import org.smexec.run.AnnotatedSleepingThread;
 import org.smexec.run.FastCalculationThreadPoolAware;
 import org.smexec.run.SEStatsPrinter;
@@ -26,6 +29,11 @@ import org.smexec.run.SleepingThreadPoolAware;
 
 public class SmartExecutorTest {
 
+    static {
+        URL resource = Thread.currentThread().getContextClassLoader().getResource("log4j-test.xml");
+        DOMConfigurator.configure(resource);
+    }
+    
 	static MemoryMXBean memoryMXBean = getMemoryMXBean();
 
 	public static void main(String[] args) throws IOException, JAXBException,
