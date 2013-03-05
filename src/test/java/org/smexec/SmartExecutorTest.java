@@ -103,7 +103,7 @@ public class SmartExecutorTest {
 
 			@Override
 			public void run() {
-				Thread.currentThread().setName("FAST_SUBMITTER");
+				Thread.currentThread().setName("FAST_SUBMITTER"); 
 				do {
 					try {
 						se.execute("FAST", new FastCalculationThreadPoolAware());
