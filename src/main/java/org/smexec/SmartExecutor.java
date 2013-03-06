@@ -39,7 +39,7 @@ import org.smexec.annotation.ThreadPoolName;
 import org.smexec.configuration.Config;
 import org.smexec.configuration.PoolConfiguration;
 import org.smexec.jmx.ExecutorStats;
-import org.smexec.jmx.ExecutorStatsMBean;
+import org.smexec.jmx.ExecutorStatsMXBean;
 import org.smexec.jmx.PoolStats;
 import org.smexec.pool.IGeneralThreadPool;
 import org.smexec.pool.ISmartScheduledThreadPool;
@@ -107,7 +107,7 @@ public class SmartExecutor {
         this.mbs = ManagementFactory.getPlatformMBeanServer();
 
         try {
-            ExecutorStatsMBean es = new ExecutorStats(this, config);
+            ExecutorStatsMXBean es = new ExecutorStats(this, config);
             mbs.registerMBean(es, new ObjectName("org.smexec:type=SmartExecutor,name=" + config.getExecutorConfiguration().getName()));
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
