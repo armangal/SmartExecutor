@@ -9,15 +9,56 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "pool")
 public class PoolConfiguration {
 
-    private String poolName;
+    /**
+     * full pool name, will be used in monitoring software
+     */
+    private String poolName; 
+    
+    /**
+     * will be used for logs, should be unique
+     */
     private String poolNameShort;
+
+    /**
+     * core pool size
+     */
     private Integer corePollSize = 5;
+    
+    /**
+     * max pool size
+     */
     private Integer maxPoolSize = 5;
+    
+    /**
+     * queue size, default -1 means that SynchronousQueue will be used
+     */
     private Integer queueSize = -1;
+    
+    /**
+     * how long to keep threads in pool above the core size.
+     */
     private Long keepAliveTime = 60000l;
+    
+    /**
+     * the type of the pool
+     */
     private PoolType poolType;
+    
+    /**
+     * how many chunks to hold in memory
+     */
     private int chunks = 100;
+    
+    /**
+     * how often to "cut" a chunk
+     */
     private long chunkInterval = 10000;
+    
+    /**
+     * how often to print chunk stats to log, -1 means never
+     * any other positive number means that each X chunk iteration the stats will be printed
+     */
+    private int logStats = 1; // default each chunk will be printed
 
     PoolConfiguration() {}
 
@@ -71,93 +112,37 @@ public class PoolConfiguration {
         return chunkInterval;
     }
 
+    public int getLogStats() {
+        return logStats;
+    }
+
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append("PoolConfiguration [poolName=");
-        builder.append(poolName);
-        builder.append(", poolNameShort=");
-        builder.append(poolNameShort);
-        builder.append(", corePollSize=");
-        builder.append(corePollSize);
-        builder.append(", maxPoolSize=");
-        builder.append(maxPoolSize);
-        builder.append(", queueSize=");
-        builder.append(queueSize);
-        builder.append(", keepAliveTime=");
-        builder.append(keepAliveTime);
-        builder.append(", poolType=");
-        builder.append(poolType);
-        builder.append(", chunks=");
-        builder.append(chunks);
-        builder.append(", chunkInterval=");
-        builder.append(chunkInterval);
-        builder.append("]");
+        builder.append("PoolConfiguration [poolName=")
+               .append(poolName)
+               .append(", poolNameShort=")
+               .append(poolNameShort)
+               .append(", corePollSize=")
+               .append(corePollSize)
+               .append(", maxPoolSize=")
+               .append(maxPoolSize)
+               .append(", queueSize=")
+               .append(queueSize)
+               .append(", keepAliveTime=")
+               .append(keepAliveTime)
+               .append(", poolType=")
+               .append(poolType)
+               .append(", chunks=")
+               .append(chunks)
+               .append(", chunkInterval=")
+               .append(chunkInterval)
+               .append(", logStats=")
+               .append(logStats)
+               .append("]");
         return builder.toString();
     }
 
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + (int) (chunkInterval ^ (chunkInterval >>> 32));
-        result = prime * result + chunks;
-        result = prime * result + ((corePollSize == null) ? 0 : corePollSize.hashCode());
-        result = prime * result + ((keepAliveTime == null) ? 0 : keepAliveTime.hashCode());
-        result = prime * result + ((maxPoolSize == null) ? 0 : maxPoolSize.hashCode());
-        result = prime * result + ((poolName == null) ? 0 : poolName.hashCode());
-        result = prime * result + ((poolNameShort == null) ? 0 : poolNameShort.hashCode());
-        result = prime * result + ((poolType == null) ? 0 : poolType.hashCode());
-        result = prime * result + ((queueSize == null) ? 0 : queueSize.hashCode());
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        PoolConfiguration other = (PoolConfiguration) obj;
-        if (chunkInterval != other.chunkInterval)
-            return false;
-        if (chunks != other.chunks)
-            return false;
-        if (corePollSize == null) {
-            if (other.corePollSize != null)
-                return false;
-        } else if (!corePollSize.equals(other.corePollSize))
-            return false;
-        if (keepAliveTime == null) {
-            if (other.keepAliveTime != null)
-                return false;
-        } else if (!keepAliveTime.equals(other.keepAliveTime))
-            return false;
-        if (maxPoolSize == null) {
-            if (other.maxPoolSize != null)
-                return false;
-        } else if (!maxPoolSize.equals(other.maxPoolSize))
-            return false;
-        if (poolName == null) {
-            if (other.poolName != null)
-                return false;
-        } else if (!poolName.equals(other.poolName))
-            return false;
-        if (poolNameShort == null) {
-            if (other.poolNameShort != null)
-                return false;
-        } else if (!poolNameShort.equals(other.poolNameShort))
-            return false;
-        if (poolType != other.poolType)
-            return false;
-        if (queueSize == null) {
-            if (other.queueSize != null)
-                return false;
-        } else if (!queueSize.equals(other.queueSize))
-            return false;
-        return true;
-    }
+    
 
 }

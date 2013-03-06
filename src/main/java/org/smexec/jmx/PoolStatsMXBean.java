@@ -1,7 +1,6 @@
 package org.smexec.jmx;
 
-
-public interface PoolStatsMBean {
+public interface PoolStatsMXBean {
 
     void printStats();
 
@@ -23,10 +22,6 @@ public interface PoolStatsMBean {
 
     Long getAvgTime();
 
-    String getTimeChunks();
-    
-    String getTasksChunks();
-
     /**
      * Returns the current number of threads in the pool.
      * 
@@ -47,7 +42,11 @@ public interface PoolStatsMBean {
      * @return the number of threads
      */
     int getLargestPoolSize();
-    
+
     String[] getTaskNames();
+
+    ExecutionTimeStats[] getExecutionTimeStats();
     
+    TaskExecutionStats[] getTaskExecutionStats();
+
 }

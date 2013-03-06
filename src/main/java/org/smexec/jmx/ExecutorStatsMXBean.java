@@ -1,6 +1,6 @@
 package org.smexec.jmx;
 
-public interface ExecutorStatsMBean {
+public interface ExecutorStatsMXBean {
 
 	String getName();
 

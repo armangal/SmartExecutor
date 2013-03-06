@@ -9,7 +9,7 @@ import org.smexec.pool.IGeneralThreadPool;
 import org.smexec.pool.PoolStatsData;
 
 public class PoolStats
-    implements PoolStatsMBean {
+    implements PoolStatsMXBean {
 
     private static Logger logger = LoggerFactory.getLogger(PoolStats.class);
 
@@ -21,7 +21,7 @@ public class PoolStats
 
     @Override
     public void printStats() {
-        logger.debug(stp.getPoolStats().toString());
+        logger.info(stp.getPoolStats().toString());
     }
 
     @Override
@@ -78,40 +78,6 @@ public class PoolStats
     }
 
     @Override
-    public String getTimeChunks() {
-        StringBuilder builder = new StringBuilder();
-        LinkedList<PoolStatsData> history = stp.getPoolStats().getHistory();
-        for (int i = 0; i < (history.size() - 1); i++) {
-            PoolStatsData h = history.get(i);
-            builder.append("[").append(h.getMaxTimeLong()).append(",").append(h.getAvgTime()).append(",").append(h.getMinTimeLong()).append("]");
-        }
-
-        return builder.toString();
-    }
-
-    @Override
-    public String getTasksChunks() {
-        StringBuilder builder = new StringBuilder();
-        LinkedList<PoolStatsData> history = stp.getPoolStats().getHistory();
-        for (int i = 0; i < (history.size() - 1); i++) {
-            PoolStatsData h = history.get(i);
-            builder.append("[")
-                   .append(h.getSubmitted())
-                   .append(",")
-                   .append(h.getExecuted())
-                   .append(",")
-                   .append(h.getFailed())
-                   .append(",")
-                   .append(h.getRejected())
-                   .append(",")
-                   .append(h.getCompleted())
-                   .append("]");
-        }
-
-        return builder.toString();
-    }
-
-    @Override
     public int getPoolSize() {
         return ((ThreadPoolExecutor) stp).getPoolSize();
     }
@@ -125,10 +91,32 @@ public class PoolStats
     public int getLargestPoolSize() {
         return ((ThreadPoolExecutor) stp).getLargestPoolSize();
     }
-    
+
     @Override
     public String[] getTaskNames() {
         return stp.getPoolStats().getTaskNames();
     }
 
+    @Override
+    public ExecutionTimeStats[] getExecutionTimeStats() {
+        LinkedList<PoolStatsData> history = stp.getPoolStats().getHistory();
+        ExecutionTimeStats[] arr = new ExecutionTimeStats[history.size() - 1];
+        for (int i = 0; i < (history.size() - 1); i++) {
+            PoolStatsData h = history.get(i);
+            ExecutionTimeStats e = new ExecutionTimeStats(h.getMinTimeLong(), h.getMaxTimeLong(), h.getAvgTime());
+            arr[i] = e;
+        }
+        return arr;
+    }
+
+    @Override
+    public TaskExecutionStats[] getTaskExecutionStats() {
+        LinkedList<PoolStatsData> history = stp.getPoolStats().getHistory();
+        TaskExecutionStats[] arr = new TaskExecutionStats[history.size() - 1];
+        for (int i = 0; i < (history.size() - 1); i++) {
+            PoolStatsData h = history.get(i);
+            arr[i] = new TaskExecutionStats(h.getSubmitted().get(), h.getExecuted().get(), h.getCompleted().get(), h.getRejected().get(), h.getFailed().get());
+        }
+        return arr;
+    }
 }

@@ -1,23 +1,35 @@
 package org.smexec.pool;
 
-import java.util.Arrays;
-import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class ThreadPoolStats {
+
+    private static Logger logger = LoggerFactory.getLogger(ThreadPoolStats.class);
 
     /**
      * the total stats about the pool
      */
     private final PoolStatsData totalData = new PoolStatsData();
 
+    private final String poolName;
     /**
      * the amount of chunks to keep in memory
      */
     private final int chunks;
+
+    /**
+     * how often to log stats
+     */
+    private final int logStats;
+
+    private int chunksCounter = 0;
 
     /**
      * the actual chunks
@@ -31,10 +43,13 @@ public class ThreadPoolStats {
 
     /**
      * @param chunks - the amount of chunks to keep in memory
+     * @param poolName
      */
-    public ThreadPoolStats(final int chunks) {
+    public ThreadPoolStats(final int chunks, final int logStats, final String poolName) {
         // keeping one more for current stats
         this.chunks = chunks + 1;
+        this.logStats = logStats;
+        this.poolName = poolName;
         // adding the current one
         history.add(new PoolStatsData());
     }
@@ -53,6 +68,12 @@ public class ThreadPoolStats {
         history.add(new PoolStatsData());
         if (history.size() > chunks) {
             history.remove();
+        }
+
+        chunksCounter++;
+        if (logStats > 0 && chunksCounter % logStats == 0) {
+            logger.info("ThreadPoolStats for pool:{}, {}", poolName, this);
+            chunksCounter = 0;
         }
     }
 
@@ -125,34 +146,6 @@ public class ThreadPoolStats {
         return keySet.toArray(new String[keySet.size()]);
     }
 
-    @Override
-    public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("\nPoolStats [submitted=")
-               .append(totalData.getSubmitted())
-               .append(", executed=")
-               .append(totalData.getExecuted())
-               .append(", completed=")
-               .append(totalData.getCompleted())
-               .append(", rejected=")
-               .append(totalData.getRejected())
-               .append(", failed=")
-               .append(totalData.getFailed())
-               .append(", minTime=")
-               .append(totalData.getMinTime())
-               .append(", maxTime=")
-               .append(totalData.getMaxTime())
-               .append(", totalTime=")
-               .append(totalData.getTotalTime())
-               .append(", avgTime=")
-               .append(totalData.getAvgTime())
-               .append("]");
-        for (PoolStatsData h : history) {
-            builder.append("\n[").append(h.getMaxTime().get()).append(",").append(h.getAvgTime()).append(",").append(h.getMinTime().get()).append("]");
-        }
-        return builder.toString();
-    }
-
     public Long getSubmitted() {
         return totalData.getSubmitted().get();
     }
@@ -206,6 +199,41 @@ public class ThreadPoolStats {
             }
         }
         return poolStatsData;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("\nPoolStats [submitted=")
+               .append(totalData.getSubmitted())
+               .append(", executed=")
+               .append(totalData.getExecuted())
+               .append(", completed=")
+               .append(totalData.getCompleted())
+               .append(", rejected=")
+               .append(totalData.getRejected())
+               .append(", failed=")
+               .append(totalData.getFailed())
+               .append(", minTime=")
+               .append(totalData.getMinTime())
+               .append(", maxTime=")
+               .append(totalData.getMaxTime())
+               .append(", totalTime=")
+               .append(totalData.getTotalTime())
+               .append(", avgTime=")
+               .append(totalData.getAvgTime())
+               .append("]");
+
+        PoolStatsData h = null;
+        if (history.size() > 1) {
+            Iterator<PoolStatsData> iterator = history.descendingIterator();
+            iterator.next();
+            h = iterator.next(); // take the one before last element, beacuse the last one will be empty
+        } else {
+            h = getCurrentChunk();
+        }
+        builder.append("\nChunk: [").append(h.toString()).append("]");
+        return builder.toString();
     }
 
 }

@@ -59,4 +59,29 @@ public class PoolStatsData {
         return (getCompleted().get() == 0 ? 0 : (getTotalTime().get() / getCompleted().get()));
     }
 
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("[submitted=")
+               .append(submitted)
+               .append(", executed=")
+               .append(executed)
+               .append(", completed=")
+               .append(completed)
+               .append(", rejected=")
+               .append(rejected)
+               .append(", failed=")
+               .append(failed)
+               .append(", minTime=")
+               .append(minTime)
+               .append(", maxTime=")
+               .append(maxTime)
+               .append(", totalTime=")
+               .append(totalTime)
+               .append("]");
+        return builder.toString();
+    }
+    
+    
+
 }

@@ -4,7 +4,7 @@ import org.smexec.SmartExecutor;
 import org.smexec.configuration.Config;
 
 public class ExecutorStats
-    implements ExecutorStatsMBean {
+    implements ExecutorStatsMXBean {
 
     private final SmartExecutor smartExecutor;
     private final Config config;
