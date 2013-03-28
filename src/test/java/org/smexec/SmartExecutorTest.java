@@ -4,7 +4,6 @@ import static java.lang.management.ManagementFactory.getMemoryMXBean;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.management.MemoryMXBean;
 import java.net.URL;
@@ -33,143 +32,129 @@ public class SmartExecutorTest {
         URL resource = Thread.currentThread().getContextClassLoader().getResource("log4j-test.xml");
         DOMConfigurator.configure(resource);
     }
-    
-	static MemoryMXBean memoryMXBean = getMemoryMXBean();
 
-	public static void main(String[] args) throws IOException, JAXBException,
-			MalformedObjectNameException, NullPointerException,
-			InstanceAlreadyExistsException, MBeanRegistrationException,
-			NotCompliantMBeanException, InterruptedException {
+    static MemoryMXBean memoryMXBean = getMemoryMXBean();
 
-		final SmartExecutor se = new SmartExecutor("SmartExecutor-test.xml");
+    public static void main(String[] args)
+        throws IOException, JAXBException, MalformedObjectNameException, NullPointerException, InstanceAlreadyExistsException, MBeanRegistrationException,
+        NotCompliantMBeanException, InterruptedException {
 
-		Runnable command = new SleepingThreadPoolAware(10011L);
-		se.execute(command);
+        final SmartExecutor se = new SmartExecutor("SmartExecutor-test.xml");
 
-		se.execute(command, PoolNamesTest.DEFAULT_POOL, "XXX");
+        Runnable command = new SleepingThreadPoolAware(10011L);
+        se.execute(command);
 
-		se.scheduleAtFixedRate(new SEStatsPrinter(se), 5000l, 5000l,
-				TimeUnit.MILLISECONDS, "Stats");
+        se.execute(command, PoolNamesTest.DEFAULT_POOL, "XXX");
 
-		se.scheduleAtFixedRate(command, 1000l, 1000l, TimeUnit.MILLISECONDS,
-				"Scheduled2", "EverySecond");
+        se.scheduleAtFixedRate(new SEStatsPrinter(se), 5000l, 5000l, TimeUnit.MILLISECONDS, "Stats");
 
-		killing(se);
-		control(se);
+        se.scheduleAtFixedRate(command, 1000l, 1000l, TimeUnit.MILLISECONDS, "Scheduled2", "EverySecond");
 
-		// check rejection
-		int rejected = 0;
-		for (int i = 0; i < 200; i++) {
-			try {
-				se.execute(command, PoolNamesTest.DEFAULT_POOL, "Reject");
-			} catch (RejectedExecutionException e) {
-				rejected++;
-			}
-		}
-		System.out.println("Rejected:" + rejected);
+        killing(se);
+        control(se);
 
-		for (int i = 0; i < 10; i++) {
-			se.execute(command, "Cached1", "Cached");
-		}
+        // check rejection
+        int rejected = 0;
+        for (int i = 0; i < 200; i++) {
+            try {
+                se.execute(command, PoolNamesTest.DEFAULT_POOL, "Reject");
+            } catch (RejectedExecutionException e) {
+                rejected++;
+            }
+        }
+        System.out.println("Rejected:" + rejected);
 
-		Random r = new Random();
-		double counter = 0;
-		do {
-			counter++;
-			try {
-				double sin = (1 + Math.cos(Math.PI + counter / Math.PI)) / 2;
-				// System.out.println(counter + "|" + sin);
-				AnnotatedSleepingThread d = new AnnotatedSleepingThread(
-						(long) Math.abs((1000 * sin)));
-				se.execute(d);
+        for (int i = 0; i < 10; i++) {
+            se.execute(command, "Cached1", "Cached");
+        }
 
-				AnnotatedSleepingThread d1 = new AnnotatedSleepingThread(
-						r.nextInt(1000));
-				;
-				se.execute(d1);
-			} catch (Exception e) {
-				// e.printStackTrace();
-			}
-			Thread.sleep(100l);
-		} while (true);
+        Random r = new Random();
+        double counter = 0;
+        do {
+            counter++;
+            try {
+                double sin = (1 + Math.cos(Math.PI + counter / Math.PI)) / 2;
+                // System.out.println(counter + "|" + sin);
+                AnnotatedSleepingThread d = new AnnotatedSleepingThread((long) Math.abs((1000 * sin)));
+                se.execute(d);
 
-	}
+                AnnotatedSleepingThread d1 = new AnnotatedSleepingThread(r.nextInt(1000));
+                ;
+                se.execute(d1);
+            } catch (Exception e) {
+                // e.printStackTrace();
+            }
+            Thread.sleep(100l);
+        } while (true);
 
-	static List<String> list = new ArrayList<String>();
-	static boolean work = true;
+    }
 
-	private static void killing(final SmartExecutor se) {
-		new Thread(new Runnable() {
+    static List<String> list = new ArrayList<String>();
+    static boolean work = true;
 
-			@Override
-			public void run() {
-				Thread.currentThread().setName("FAST_SUBMITTER"); 
-				do {
-					try {
-						se.execute("FAST", new FastCalculationThreadPoolAware());
-						for (int i = 0; work && i < 2; i++)
-							list.add(""
-									+ i
-									+ Arrays.toString(Thread.currentThread()
-											.getStackTrace()));
+    private static void killing(final SmartExecutor se) {
+        new Thread(new Runnable() {
 
-						double usage = memoryMXBean.getHeapMemoryUsage()
-								.getUsed()
-								* 100d
-								/ memoryMXBean.getHeapMemoryUsage().getMax();
-						if (usage > 80d) {
-							list.clear();
-							System.out.println("Clearing list, memory usage:"
-									+ usage);
-						}
-						Thread.sleep(10L);
-					} catch (Exception e) {
+            @Override
+            public void run() {
+                Thread.currentThread().setName("FAST_SUBMITTER");
+                do {
+                    try {
+                        se.execute("FAST", new FastCalculationThreadPoolAware());
+                        for (int i = 0; work && i < 5; i++)
+                            list.add("" + i + Arrays.toString(Thread.currentThread().getStackTrace()));
 
-					}
-				} while (true);
-			};
-		}).start();
+                        double usage = memoryMXBean.getHeapMemoryUsage().getUsed() * 100d / memoryMXBean.getHeapMemoryUsage().getMax();
+                        if (usage > 95d) {
+                            list.clear();
+                            //System.out.println("Clearing list, memory usage:" + usage);
+                        }
+                        Thread.sleep(1L);
+                    } catch (Exception e) {
 
-	}
+                    }
+                } while (true);
+            };
+        }).start();
 
-	private static void control(final SmartExecutor se) {
-		new Thread(new Runnable() {
+    }
 
-			@Override
-			public void run() {
-				Thread.currentThread().setName("CONTROL");
-				do {
-					try {
-						System.out.print("Enter command: ");
+    private static void control(final SmartExecutor se) {
+        new Thread(new Runnable() {
 
-						// open up standard input
-						BufferedReader br = new BufferedReader(
-								new InputStreamReader(System.in));
+            @Override
+            public void run() {
+                Thread.currentThread().setName("CONTROL");
+                do {
+                    try {
+                        System.out.print("Enter command: ");
 
-						String cmd = null;
+                        // open up standard input
+                        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-						try {
-							cmd = br.readLine();
-							if ("1".equals(cmd)) {
-								list.clear();
-							}
-							if ("2".equals(cmd)) {
-								work = false;
-							}
-							if ("3".equals(cmd)) {
-								work = true;
-							}
-						} catch (IOException ioe) {
-							System.out
-									.println("IO error trying to read your name!");
-						}
+                        String cmd = null;
 
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				} while (true);
-			};
-		}).start();
+                        try {
+                            cmd = br.readLine();
+                            if ("1".equals(cmd)) {
+                                list.clear();
+                            }
+                            if ("2".equals(cmd)) {
+                                work = false;
+                            }
+                            if ("3".equals(cmd)) {
+                                work = true;
+                            }
+                        } catch (IOException ioe) {
+                            System.out.println("IO error trying to read your name!");
+                        }
 
-	}
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                } while (true);
+            };
+        }).start();
+
+    }
 }

@@ -1,5 +1,7 @@
 package org.smexec.run;
 
+import java.util.Random;
+
 import org.smexec.annotation.ThreadNameSuffix;
 import org.smexec.annotation.ThreadPoolName;
 
@@ -18,7 +20,7 @@ public class AnnotatedSleepingThread
     @Override
     public void run() {
 //        System.out.println("AnnotatedSleepingThread, Sleeping with:" + delay + "[" + Thread.currentThread().getName() + "]");
-        if (delay % 10 == 0) {
+        if (new Random().nextInt(5) == 0) {
             throw new RuntimeException("Just fail");
         }
         try {

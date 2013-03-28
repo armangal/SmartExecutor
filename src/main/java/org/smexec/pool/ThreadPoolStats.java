@@ -1,5 +1,6 @@
 package org.smexec.pool;
 
+import java.util.Calendar;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Set;
@@ -65,7 +66,11 @@ public class ThreadPoolStats {
      * creates new chunk and cleans the history if needed
      */
     public void cutChunk() {
+        PoolStatsData currentChunk = getCurrentChunk();
         history.add(new PoolStatsData());
+
+        Calendar calendar = Calendar.getInstance();
+        currentChunk.setChunkTime((calendar.get(Calendar.HOUR_OF_DAY) * 10000) + (calendar.get(Calendar.MINUTE) * 100) + calendar.get(Calendar.SECOND));
         if (history.size() > chunks) {
             history.remove();
         }

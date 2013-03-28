@@ -240,7 +240,7 @@ public class SmartExecutor {
                         mbs.registerMBean(mbean, new ObjectName("org.smexec:type=SmartExecutor.Pools,name=" + threadPool.getPoolConfiguration().getPoolName()
                                                                 + "(" + threadPool.getPoolConfiguration().getPoolNameShort() + ")"));
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        logger.error(e.getMessage(), e);
                     }
 
                     return threadPool;

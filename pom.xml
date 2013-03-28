@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.smexec</groupId>
 	<artifactId>smartexecutor</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
+	<version>1.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<name>smartexecutor</name>
 	<description>
@@ -66,13 +66,6 @@
 		</dependency>
 
 	</dependencies>
-
-	<distributionManagement>
-		<repository>
-			<id>smartexecutor-github-repo</id>
-			<url>${github.url}</url>
-		</repository>
-	</distributionManagement>
 
 	<build>
 		<plugins>
@@ -161,4 +154,17 @@
 			</build>
 		</profile>
 	</profiles>
+	
+	<distributionManagement>
+        <repository>
+            <id>release-repository</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+        </repository>
+        <snapshotRepository>
+            <id>snapshot-repository</id>
+            <name>Maven2 Snapshot Repository</name>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+            <uniqueVersion>false</uniqueVersion>
+        </snapshotRepository>
+    </distributionManagement>
 </project>

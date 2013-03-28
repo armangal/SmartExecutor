@@ -103,7 +103,7 @@ public class PoolStats
         ExecutionTimeStats[] arr = new ExecutionTimeStats[history.size() - 1];
         for (int i = 0; i < (history.size() - 1); i++) {
             PoolStatsData h = history.get(i);
-            ExecutionTimeStats e = new ExecutionTimeStats(h.getMinTimeLong(), h.getMaxTimeLong(), h.getAvgTime());
+            ExecutionTimeStats e = new ExecutionTimeStats(h.getMinTimeLong(), h.getMaxTimeLong(), h.getAvgTime(), h.getChunkTime());
             arr[i] = e;
         }
         return arr;
@@ -115,7 +115,12 @@ public class PoolStats
         TaskExecutionStats[] arr = new TaskExecutionStats[history.size() - 1];
         for (int i = 0; i < (history.size() - 1); i++) {
             PoolStatsData h = history.get(i);
-            arr[i] = new TaskExecutionStats(h.getSubmitted().get(), h.getExecuted().get(), h.getCompleted().get(), h.getRejected().get(), h.getFailed().get());
+            arr[i] = new TaskExecutionStats(h.getSubmitted().get(),
+                                            h.getExecuted().get(),
+                                            h.getCompleted().get(),
+                                            h.getRejected().get(),
+                                            h.getFailed().get(),
+                                            h.getChunkTime());
         }
         return arr;
     }
