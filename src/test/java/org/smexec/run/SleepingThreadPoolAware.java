@@ -1,5 +1,7 @@
 package org.smexec.run;
 
+import org.smexec.DefaultPoolNames;
+import org.smexec.IPoolName;
 import org.smexec.IThreadPoolAware;
 
 public class SleepingThreadPoolAware
@@ -26,7 +28,7 @@ public class SleepingThreadPoolAware
     }
 
     @Override
-    public String getPoolName() {
-        return "Default";
+    public IPoolName getPoolName() {
+        return DefaultPoolNames.DEFAULT;
     }
 }

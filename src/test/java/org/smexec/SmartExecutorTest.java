@@ -44,11 +44,11 @@ public class SmartExecutorTest {
         Runnable command = new SleepingThreadPoolAware(10011L);
         se.execute(command);
 
-        se.execute(command, PoolNamesTest.DEFAULT_POOL, "XXX");
+        se.execute(command, DefaultPoolNames.DEFAULT, "XXX");
 
         se.scheduleAtFixedRate(new SEStatsPrinter(se), 5000l, 5000l, TimeUnit.MILLISECONDS, "Stats");
 
-        se.scheduleAtFixedRate(command, 1000l, 1000l, TimeUnit.MILLISECONDS, "Scheduled2", "EverySecond");
+        se.scheduleAtFixedRate(command, 1000l, 1000l, TimeUnit.MILLISECONDS, TestPoolNames.SCHEDULED_POOL, "EverySecond");
 
         killing(se);
         control(se);
@@ -57,7 +57,7 @@ public class SmartExecutorTest {
         int rejected = 0;
         for (int i = 0; i < 200; i++) {
             try {
-                se.execute(command, PoolNamesTest.DEFAULT_POOL, "Reject");
+                se.execute(command, DefaultPoolNames.DEFAULT, "Reject");
             } catch (RejectedExecutionException e) {
                 rejected++;
             }
@@ -65,7 +65,7 @@ public class SmartExecutorTest {
         System.out.println("Rejected:" + rejected);
 
         for (int i = 0; i < 10; i++) {
-            se.execute(command, "Cached1", "Cached");
+            se.execute(command, TestPoolNames.CACHED1, "Cached");
         }
 
         Random r = new Random();
@@ -107,7 +107,7 @@ public class SmartExecutorTest {
                         double usage = memoryMXBean.getHeapMemoryUsage().getUsed() * 100d / memoryMXBean.getHeapMemoryUsage().getMax();
                         if (usage > 95d) {
                             list.clear();
-                            //System.out.println("Clearing list, memory usage:" + usage);
+                            // System.out.println("Clearing list, memory usage:" + usage);
                         }
                         Thread.sleep(1L);
                     } catch (Exception e) {

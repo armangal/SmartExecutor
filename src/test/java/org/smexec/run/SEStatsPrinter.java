@@ -1,10 +1,10 @@
 package org.smexec.run;
 
-import org.smexec.PoolNamesTest;
 import org.smexec.SmartExecutor;
+import org.smexec.TestPoolNamesConstants;
 import org.smexec.annotation.ThreadPoolName;
 
-@ThreadPoolName(poolName = PoolNamesTest.SCHEDULED_POOL)
+@ThreadPoolName(poolName = TestPoolNamesConstants.SCHEDULED)
 public class SEStatsPrinter
     implements Runnable {
 

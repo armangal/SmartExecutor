@@ -9,5 +9,5 @@ public interface IThreadPoolAware {
     /**
      * @return the destination pool name.
      */
-    String getPoolName();
+    IPoolName getPoolName();
 }
