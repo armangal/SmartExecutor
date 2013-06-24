@@ -1,3 +1,18 @@
+/**
+ * Copyright (C) 2013 Arman Gal
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.smexec;
 
 import static java.lang.management.ManagementFactory.getMemoryMXBean;
@@ -29,7 +44,7 @@ import org.smexec.run.SleepingThreadPoolAware;
 public class SmartExecutorTest {
 
     static {
-        URL resource = Thread.currentThread().getContextClassLoader().getResource("log4j-test.xml");
+        URL resource = ClassLoader.getSystemResource("log4j-test.xml");
         DOMConfigurator.configure(resource);
     }
 
@@ -44,11 +59,11 @@ public class SmartExecutorTest {
         Runnable command = new SleepingThreadPoolAware(10011L);
         se.execute(command);
 
-        se.execute(command, DefaultPoolNames.DEFAULT, "XXX");
+        se.execute(command, TaskMetadata.newMetadata("XXX"));
 
-        se.scheduleAtFixedRate(new SEStatsPrinter(se), 5000l, 5000l, TimeUnit.MILLISECONDS, "Stats");
+        se.scheduleAtFixedRate(new SEStatsPrinter(se), 5000l, 5000l, TimeUnit.MILLISECONDS, TaskMetadata.newMetadata("Stats"));
 
-        se.scheduleAtFixedRate(command, 1000l, 1000l, TimeUnit.MILLISECONDS, TestPoolNames.SCHEDULED_POOL, "EverySecond");
+        se.scheduleAtFixedRate(command, 1000l, 1000l, TimeUnit.MILLISECONDS, TaskMetadata.newMetadata(TestPoolNames.SCHEDULED_POOL, "EverySecond"));
 
         killing(se);
         control(se);
@@ -57,7 +72,7 @@ public class SmartExecutorTest {
         int rejected = 0;
         for (int i = 0; i < 200; i++) {
             try {
-                se.execute(command, DefaultPoolNames.DEFAULT, "Reject");
+                se.execute(command, TaskMetadata.newMetadata(DefaultPoolNames.DEFAULT, "Reject"));
             } catch (RejectedExecutionException e) {
                 rejected++;
             }
@@ -65,7 +80,7 @@ public class SmartExecutorTest {
         System.out.println("Rejected:" + rejected);
 
         for (int i = 0; i < 10; i++) {
-            se.execute(command, TestPoolNames.CACHED1, "Cached");
+            se.execute(command, TaskMetadata.newMetadata(TestPoolNames.CACHED1, "Cached"));
         }
 
         Random r = new Random();
@@ -79,10 +94,10 @@ public class SmartExecutorTest {
                 se.execute(d);
 
                 AnnotatedSleepingThread d1 = new AnnotatedSleepingThread(r.nextInt(1000));
-                ;
+
                 se.execute(d1);
             } catch (Exception e) {
-                // e.printStackTrace();
+                //e.printStackTrace();
             }
             Thread.sleep(100l);
         } while (true);
@@ -100,7 +115,7 @@ public class SmartExecutorTest {
                 Thread.currentThread().setName("FAST_SUBMITTER");
                 do {
                     try {
-                        se.execute("FAST", new FastCalculationThreadPoolAware());
+                        se.execute(new FastCalculationThreadPoolAware(), TaskMetadata.newMetadata("FAST"));
                         for (int i = 0; work && i < 5; i++)
                             list.add("" + i + Arrays.toString(Thread.currentThread().getStackTrace()));
 

@@ -1,16 +1,17 @@
 /**
- * MIT License 
- * 
- * Copyright (c) 2013 Arman Gal
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
- * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
- * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * Copyright (C) 2013 Arman Gal
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.smexec.pool.impl;
 
@@ -26,10 +27,12 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import org.smexec.TaskMetadata;
 import org.smexec.configuration.PoolConfiguration;
 import org.smexec.configuration.PoolType;
 import org.smexec.pool.ISmartThreadPool;
 import org.smexec.pool.ThreadPoolStats;
+import org.smexec.utils.Utils;
 
 public class SmartThreadPool
     extends ThreadPoolExecutor
@@ -57,68 +60,79 @@ public class SmartThreadPool
 
     @Override
     public void execute(Runnable command) {
-        execute(command, null);
+        TaskMetadata taskMetadata = TaskMetadata.newDefaultMetadata();
+        taskMetadata.setStack(new Throwable().getStackTrace());
+        Utils.fillMetaData(taskMetadata, command);
+
+        execute(command, taskMetadata);
     }
 
     @Override
-    public void execute(Runnable command, String threadNameSuffix) {
-        String taskIdentification = ThreadPoolHelper.getTaskIdentification(command);
-        poolStats.incrementSubmitted(taskIdentification);
+    public void execute(Runnable command, TaskMetadata taskMetadata) {
+        poolStats.incrementSubmitted(taskMetadata.getTaskId());
         try {
-            super.execute(ThreadPoolHelper.wrapRunnble(command, taskIdentification, threadNameSuffix, poolStats));
+            super.execute(ThreadPoolHelper.wrapRunnble(command, taskMetadata, poolStats));
         } catch (RejectedExecutionException e) {
-            poolStats.incrementRejected(taskIdentification);
+            poolStats.incrementRejected(taskMetadata.getTaskId());
             throw e;
         }
     }
 
     @Override
     public <T> Future<T> submit(Callable<T> task) {
-        return submit(task, null);
+        TaskMetadata taskMetadata = TaskMetadata.newDefaultMetadata();
+        taskMetadata.setStack(new Throwable().getStackTrace());
+        Utils.fillMetaData(taskMetadata, task);
+        return submit(task, taskMetadata);
     }
 
     @Override
-    public <T> Future<T> submit(Callable<T> task, String threadNameSuffix) {
-        String taskIdentification = ThreadPoolHelper.getTaskIdentification(task);
+    public <T> Future<T> submit(Callable<T> task, TaskMetadata taskMetadata) {
         try {
-            poolStats.incrementSubmitted(taskIdentification);
-            return super.submit(ThreadPoolHelper.wrapCallable(task, taskIdentification, threadNameSuffix, poolStats));
+            poolStats.incrementSubmitted(taskMetadata.getTaskId());
+            return super.submit(ThreadPoolHelper.wrapCallable(task, taskMetadata, poolStats));
         } catch (RejectedExecutionException e) {
-            poolStats.incrementRejected(taskIdentification);
+            poolStats.incrementRejected(taskMetadata.getTaskId());
             throw e;
         }
     }
 
     @Override
     public Future<?> submit(Runnable task) {
-        return submit(task, null);
+        TaskMetadata taskMetadata = TaskMetadata.newDefaultMetadata();
+        taskMetadata.setStack(new Throwable().getStackTrace());
+        Utils.fillMetaData(taskMetadata, task);
+
+        return submit(task, taskMetadata);
     }
 
     @Override
-    public Future<?> submit(Runnable task, String threadNameSuffix) {
-        String taskIdentification = ThreadPoolHelper.getTaskIdentification(task);
-        poolStats.incrementSubmitted(taskIdentification);
+    public Future<?> submit(Runnable task, TaskMetadata taskMetadata) {
+        poolStats.incrementSubmitted(taskMetadata.getTaskId());
         try {
-            return super.submit(ThreadPoolHelper.wrapRunnble(task, taskIdentification, threadNameSuffix, poolStats));
+            return super.submit(ThreadPoolHelper.wrapRunnble(task, taskMetadata, poolStats));
         } catch (RejectedExecutionException e) {
-            poolStats.incrementRejected(taskIdentification);
+            poolStats.incrementRejected(taskMetadata.getTaskId());
             throw e;
         }
     }
 
     @Override
     public <T> Future<T> submit(Runnable task, T result) {
-        return submit(task, result, null);
+        TaskMetadata taskMetadata = TaskMetadata.newDefaultMetadata();
+        taskMetadata.setStack(new Throwable().getStackTrace());
+        Utils.fillMetaData(taskMetadata, task);
+
+        return submit(task, result, taskMetadata);
     }
 
     @Override
-    public <T> Future<T> submit(Runnable task, T result, String threadNameSuffix) {
-        String taskIdentification = ThreadPoolHelper.getTaskIdentification(task);
-        poolStats.incrementSubmitted(taskIdentification);
+    public <T> Future<T> submit(Runnable task, T result, TaskMetadata taskMetadata) {
+        poolStats.incrementSubmitted(taskMetadata.getTaskId());
         try {
-            return super.submit(ThreadPoolHelper.wrapRunnble(task, taskIdentification, threadNameSuffix, poolStats), result);
+            return super.submit(ThreadPoolHelper.wrapRunnble(task, taskMetadata, poolStats), result);
         } catch (RejectedExecutionException e) {
-            poolStats.incrementRejected(taskIdentification);
+            poolStats.incrementRejected(taskMetadata.getTaskId());
             throw e;
         }
     }
@@ -134,7 +148,7 @@ public class SmartThreadPool
         throws InterruptedException {
         poolStats.incrementSubmitted(tasks.size());
         try {
-            return super.invokeAll(ThreadPoolHelper.wrapCallable(tasks, null, poolStats));
+            return super.invokeAll(ThreadPoolHelper.wrapCallable(tasks, poolStats));
         } catch (RejectedExecutionException e) {
             poolStats.incrementRejected(tasks.size());
             throw e;
@@ -146,7 +160,7 @@ public class SmartThreadPool
         throws InterruptedException {
         poolStats.incrementSubmitted(tasks.size());
         try {
-            return super.invokeAll(ThreadPoolHelper.wrapCallable(tasks, null, poolStats), timeout, unit);
+            return super.invokeAll(ThreadPoolHelper.wrapCallable(tasks, poolStats), timeout, unit);
         } catch (RejectedExecutionException e) {
             poolStats.incrementRejected(tasks.size());
             throw e;
@@ -158,7 +172,7 @@ public class SmartThreadPool
         throws InterruptedException, ExecutionException {
         poolStats.incrementSubmitted(tasks.size());
         try {
-            return super.invokeAny(ThreadPoolHelper.wrapCallable(tasks, null, poolStats));
+            return super.invokeAny(ThreadPoolHelper.wrapCallable(tasks, poolStats));
         } catch (RejectedExecutionException e) {
             poolStats.incrementRejected(tasks.size());
             throw e;
@@ -170,7 +184,7 @@ public class SmartThreadPool
         throws InterruptedException, ExecutionException, TimeoutException {
         poolStats.incrementSubmitted(tasks.size());
         try {
-            return super.invokeAny(ThreadPoolHelper.wrapCallable(tasks, null, poolStats), timeout, unit);
+            return super.invokeAny(ThreadPoolHelper.wrapCallable(tasks, poolStats), timeout, unit);
         } catch (RejectedExecutionException e) {
             poolStats.incrementRejected(tasks.size());
             throw e;

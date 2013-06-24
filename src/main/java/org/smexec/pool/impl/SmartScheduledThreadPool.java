@@ -1,16 +1,17 @@
 /**
- * MIT License 
- * 
- * Copyright (c) 2013 Arman Gal
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
- * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
- * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * Copyright (C) 2013 Arman Gal
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.smexec.pool.impl;
 
@@ -20,9 +21,11 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import org.smexec.TaskMetadata;
 import org.smexec.configuration.PoolConfiguration;
 import org.smexec.pool.ISmartScheduledThreadPool;
 import org.smexec.pool.ThreadPoolStats;
+import org.smexec.utils.Utils;
 
 public class SmartScheduledThreadPool
     extends ScheduledThreadPoolExecutor
@@ -48,73 +51,82 @@ public class SmartScheduledThreadPool
 
     @Override
     public ScheduledFuture<?> schedule(Runnable command, long delay, TimeUnit unit) {
-        return schedule(command, delay, unit, null);
+        TaskMetadata taskMetadata = TaskMetadata.newDefaultMetadata();
+        taskMetadata.setStack(new Throwable().getStackTrace());
+        Utils.fillMetaData(taskMetadata, command);
+
+        return schedule(command, delay, unit, taskMetadata);
     }
 
     @Override
-    public ScheduledFuture<?> schedule(Runnable command, long delay, TimeUnit unit, String threadNameSuffix) {
-        String taskIdentification = ThreadPoolHelper.getTaskIdentification(command);
+    public ScheduledFuture<?> schedule(Runnable command, long delay, TimeUnit unit, TaskMetadata taskMetadata) {
         try {
-            poolStats.incrementSubmitted(taskIdentification);
-            return super.schedule(ThreadPoolHelper.wrapRunnble(command, taskIdentification, threadNameSuffix, poolStats), delay, unit);
+            poolStats.incrementSubmitted(taskMetadata.getTaskId());
+            return super.schedule(ThreadPoolHelper.wrapRunnble(command, taskMetadata, poolStats), delay, unit);
         } catch (RejectedExecutionException e) {
-            poolStats.incrementRejected(taskIdentification);
+            poolStats.incrementRejected(taskMetadata.getTaskId());
             throw e;
         }
     }
 
     @Override
     public <V> ScheduledFuture<V> schedule(Callable<V> callable, long delay, TimeUnit unit) {
-        return schedule(callable, delay, unit, null);
+        TaskMetadata taskMetadata = TaskMetadata.newDefaultMetadata();
+        taskMetadata.setStack(new Throwable().getStackTrace());
+        Utils.fillMetaData(taskMetadata, callable);
+
+        return schedule(callable, delay, unit, taskMetadata);
     }
 
     @Override
-    public <V> ScheduledFuture<V> schedule(Callable<V> callable, long delay, TimeUnit unit, String threadNameSuffix) {
-        String taskIdentification = ThreadPoolHelper.getTaskIdentification(callable);
+    public <V> ScheduledFuture<V> schedule(Callable<V> callable, long delay, TimeUnit unit, TaskMetadata taskMetadata) {
         try {
-            poolStats.incrementSubmitted(taskIdentification);
-            return super.schedule(ThreadPoolHelper.wrapCallable(callable, taskIdentification, threadNameSuffix, poolStats), delay, unit);
+            poolStats.incrementSubmitted(taskMetadata.getTaskId());
+            return super.schedule(ThreadPoolHelper.wrapCallable(callable, taskMetadata, poolStats), delay, unit);
         } catch (RejectedExecutionException e) {
-            poolStats.incrementRejected(taskIdentification);
+            poolStats.incrementRejected(taskMetadata.getTaskId());
             throw e;
         }
     }
 
     @Override
     public ScheduledFuture<?> scheduleAtFixedRate(Runnable command, long initialDelay, long period, TimeUnit unit) {
-        return scheduleAtFixedRate(command, initialDelay, period, unit, null);
+        TaskMetadata taskMetadata = TaskMetadata.newDefaultMetadata();
+        taskMetadata.setStack(new Throwable().getStackTrace());
+        Utils.fillMetaData(taskMetadata, command);
+
+        return scheduleAtFixedRate(command, initialDelay, period, unit, taskMetadata);
     }
 
     @Override
-    public ScheduledFuture<?> scheduleAtFixedRate(Runnable command, long initialDelay, long period, TimeUnit unit, String threadNameSuffix) {
-        String taskIdentification = ThreadPoolHelper.getTaskIdentification(command);
+    public ScheduledFuture<?> scheduleAtFixedRate(Runnable command, long initialDelay, long period, TimeUnit unit, TaskMetadata taskMetadata) {
 
         try {
-            poolStats.incrementSubmitted(taskIdentification);
-            return super.scheduleAtFixedRate(ThreadPoolHelper.wrapRunnble(command, taskIdentification, threadNameSuffix, poolStats), initialDelay, period, unit);
+            poolStats.incrementSubmitted(taskMetadata.getTaskId());
+            return super.scheduleAtFixedRate(ThreadPoolHelper.wrapRunnble(command, taskMetadata, poolStats), initialDelay, period, unit);
         } catch (RejectedExecutionException e) {
-            poolStats.incrementRejected(taskIdentification);
+            poolStats.incrementRejected(taskMetadata.getTaskId());
             throw e;
         }
     }
 
     @Override
     public ScheduledFuture<?> scheduleWithFixedDelay(Runnable command, long initialDelay, long delay, TimeUnit unit) {
-        return scheduleWithFixedDelay(command, initialDelay, delay, unit, null);
+        TaskMetadata taskMetadata = TaskMetadata.newDefaultMetadata();
+        taskMetadata.setStack(new Throwable().getStackTrace());
+        Utils.fillMetaData(taskMetadata, command);
+
+        return scheduleWithFixedDelay(command, initialDelay, delay, unit, taskMetadata);
     }
 
     @Override
-    public ScheduledFuture<?> scheduleWithFixedDelay(Runnable command, long initialDelay, long delay, TimeUnit unit, String threadNameSuffix) {
-        String taskIdentification = ThreadPoolHelper.getTaskIdentification(command);
+    public ScheduledFuture<?> scheduleWithFixedDelay(Runnable command, long initialDelay, long delay, TimeUnit unit, TaskMetadata taskMetadata) {
 
         try {
-            poolStats.incrementSubmitted(taskIdentification);
-            return super.scheduleWithFixedDelay(ThreadPoolHelper.wrapRunnble(command, taskIdentification, threadNameSuffix, poolStats),
-                                                initialDelay,
-                                                delay,
-                                                unit);
+            poolStats.incrementSubmitted(taskMetadata.getTaskId());
+            return super.scheduleWithFixedDelay(ThreadPoolHelper.wrapRunnble(command, taskMetadata, poolStats), initialDelay, delay, unit);
         } catch (RejectedExecutionException e) {
-            poolStats.incrementRejected(taskIdentification);
+            poolStats.incrementRejected(taskMetadata.getTaskId());
             throw e;
         }
     }
