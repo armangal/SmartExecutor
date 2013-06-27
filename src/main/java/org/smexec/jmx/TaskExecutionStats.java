@@ -17,24 +17,39 @@ package org.smexec.jmx;
 
 import java.beans.ConstructorProperties;
 
-public class TaskExecutionStats {
+public class TaskExecutionStats
+    extends AbstractJmxStatEntry {
 
     private long submitted;
     private long executed;
     private long completed;
     private long rejected;
     private long failed;
-    private long chunkTime;
 
-    @ConstructorProperties({"submitted", "executed", "completed", "rejected", "failed", "chunkTime"})
-    public TaskExecutionStats(long submitted, long executed, long completed, long rejected, long failed, long chunkTime) {
-        super();
+    private long min;
+    private long max;
+    private long totalTime;
+
+    @ConstructorProperties({"startTime", "endTime", "submitted", "executed", "completed", "rejected", "failed", "min", "max", "totalTime"})
+    public TaskExecutionStats(long startTime,
+                              long endTime,
+                              long submitted,
+                              long executed,
+                              long completed,
+                              long rejected,
+                              long failed,
+                              long min,
+                              long max,
+                              long totalTime) {
+        super(startTime, endTime);
         this.submitted = submitted;
         this.executed = executed;
         this.completed = completed;
         this.rejected = rejected;
         this.failed = failed;
-        this.chunkTime = chunkTime;
+        this.min = min;
+        this.max = max;
+        this.totalTime = totalTime;
     }
 
     public long getSubmitted() {
@@ -57,7 +72,39 @@ public class TaskExecutionStats {
         return failed;
     }
 
-    public long getChunkTime() {
-        return chunkTime;
+    public long getMin() {
+        return min;
     }
+
+    public long getMax() {
+        return max;
+    }
+
+    public long getTotalTime() {
+        return totalTime;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("TaskExecutionStats [submitted=")
+               .append(submitted)
+               .append(", executed=")
+               .append(executed)
+               .append(", completed=")
+               .append(completed)
+               .append(", rejected=")
+               .append(rejected)
+               .append(", failed=")
+               .append(failed)
+               .append(", min=")
+               .append(min)
+               .append(", max=")
+               .append(max)
+               .append(", totalTime=")
+               .append(totalTime)
+               .append("]");
+        return builder.toString();
+    }
+
 }

@@ -15,23 +15,32 @@
  */
 package org.smexec.jmx;
 
-import java.util.LinkedList;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.smexec.pool.IGeneralThreadPool;
-import org.smexec.pool.PoolStatsData;
 
 public class PoolStats
+    extends AbstractStats
     implements PoolStatsMXBean {
 
-    private static Logger logger = LoggerFactory.getLogger(PoolStats.class);
+    private static final String BEAN_NAME = "org.smexec:type=SmartExecutor.Pools,name=";
+
+    private Logger logger;
 
     private final IGeneralThreadPool stp;
 
     public PoolStats(final IGeneralThreadPool stp) {
+        super(BEAN_NAME + stp.getPoolConfiguration().getPoolName() + "(" + stp.getPoolConfiguration().getPoolNameShort() + ")");
+
+        logger = LoggerFactory.getLogger("PoolStats_" + stp.getPoolConfiguration().getPoolNameShort());
         this.stp = stp;
+    }
+
+    @Override
+    public String getName() {
+        return stp.getPoolConfiguration().getPoolName() + "(" + stp.getPoolConfiguration().getPoolNameShort() + ")";
     }
 
     @Override
@@ -70,14 +79,12 @@ public class PoolStats
 
     @Override
     public Long getMinTime() {
-
-        return stp.getPoolStats().getMinTime() == Long.MAX_VALUE ? 0 : stp.getPoolStats().getMinTime();
+        return stp.getPoolStats().getMinTime().longValue() == Long.MAX_VALUE ? Long.valueOf(0L) : stp.getPoolStats().getMinTime();
     }
 
     @Override
     public Long getMaxTime() {
-
-        return stp.getPoolStats().getMaxTime() == Long.MIN_VALUE ? 0 : stp.getPoolStats().getMaxTime();
+        return stp.getPoolStats().getMaxTime().longValue() == Long.MIN_VALUE ? Long.valueOf(0L) : stp.getPoolStats().getMaxTime();
     }
 
     @Override
@@ -113,30 +120,13 @@ public class PoolStats
     }
 
     @Override
-    public ExecutionTimeStats[] getExecutionTimeStats() {
-        LinkedList<PoolStatsData> history = stp.getPoolStats().getHistory();
-        ExecutionTimeStats[] arr = new ExecutionTimeStats[history.size() - 1];
-        for (int i = 0; i < (history.size() - 1); i++) {
-            PoolStatsData h = history.get(i);
-            ExecutionTimeStats e = new ExecutionTimeStats(h.getMinTimeLong(), h.getMaxTimeLong(), h.getAvgTime(), h.getChunkTime());
-            arr[i] = e;
-        }
-        return arr;
+    public TaskExecutionStats[] getTaskExecutionStats() {
+
+        return stp.getPoolStats().getAllStats();
     }
 
     @Override
-    public TaskExecutionStats[] getTaskExecutionStats() {
-        LinkedList<PoolStatsData> history = stp.getPoolStats().getHistory();
-        TaskExecutionStats[] arr = new TaskExecutionStats[history.size() - 1];
-        for (int i = 0; i < (history.size() - 1); i++) {
-            PoolStatsData h = history.get(i);
-            arr[i] = new TaskExecutionStats(h.getSubmitted().get(),
-                                            h.getExecuted().get(),
-                                            h.getCompleted().get(),
-                                            h.getRejected().get(),
-                                            h.getFailed().get(),
-                                            h.getChunkTime());
-        }
-        return arr;
+    public TaskExecutionStats[] getLastTaskExecutionStats(long lastUpdate) {
+        return stp.getPoolStats().getLastStats(lastUpdate);
     }
 }

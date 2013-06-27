@@ -4,7 +4,7 @@
 
 	<groupId>org.smexec</groupId>
 	<artifactId>smartexecutor</artifactId>
-	<version>1.0.2-SNAPSHOT</version>
+	<version>1.0.3-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<name>smartexecutor</name>
 	<description>SmartExecutor is a light-weight thread execution framework. The goal of the framework is to provide easy controllable thread executions.</description>
@@ -42,6 +42,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.build.java.version>1.6</project.build.java.version>
 		<github.url>file://${project.basedir}/mvn-local-repo</github.url>
+		<github.global.server>github</github.global.server>
 	</properties>
 
 	<dependencyManagement>

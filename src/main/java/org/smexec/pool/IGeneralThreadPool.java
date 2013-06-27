@@ -30,7 +30,6 @@ public interface IGeneralThreadPool
      * Returns the core number of threads.
      * 
      * @return the core number of threads
-     * @see #setCorePoolSize
      */
     int getCorePoolSize();
 
@@ -38,7 +37,6 @@ public interface IGeneralThreadPool
      * Returns the maximum allowed number of threads.
      * 
      * @return the maximum allowed number of threads
-     * @see #setMaximumPoolSize
      */
     int getMaximumPoolSize();
 

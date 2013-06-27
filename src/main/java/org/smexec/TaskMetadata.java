@@ -15,6 +15,8 @@
  */
 package org.smexec;
 
+import java.util.Arrays;
+
 /**
  * A metadata class that is "following" the task during its' execution and holding extra information about the
  * way it should be executed.
@@ -94,11 +96,11 @@ public class TaskMetadata {
     }
 
     public void setStack(StackTraceElement[] stack) {
-        this.stack = stack;
+        this.stack = Arrays.copyOf(stack, stack.length);
     }
 
     public StackTraceElement[] getStack() {
-        return stack;
+        return Arrays.copyOf(stack, stack.length);
     }
 
     public String getStackTraceAsString() {

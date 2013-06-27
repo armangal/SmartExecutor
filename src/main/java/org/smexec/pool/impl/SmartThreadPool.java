@@ -53,9 +53,6 @@ public class SmartThreadPool
         this.poolConf = poolConf;
         this.poolStats = new ThreadPoolStats(poolConf.getChunks(), poolConf.getLogStats(), poolConf.getPoolName());
 
-        // Schedule custom chunker thread
-        ThreadPoolHelper.scheduleChunker(poolConf, poolStats);
-
     }
 
     @Override

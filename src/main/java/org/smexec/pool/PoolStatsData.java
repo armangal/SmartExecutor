@@ -27,7 +27,6 @@ public class PoolStatsData {
     private final AtomicLong minTime = new AtomicLong(Long.MAX_VALUE);
     private final AtomicLong maxTime = new AtomicLong(Long.MIN_VALUE);
     private final AtomicLong totalTime = new AtomicLong(0);
-    private long chunkTime;
 
     public PoolStatsData() {}
 
@@ -75,12 +74,15 @@ public class PoolStatsData {
         return (getCompleted().get() == 0 ? 0 : (getTotalTime().get() / getCompleted().get()));
     }
 
-    public long getChunkTime() {
-        return chunkTime;
-    }
-
-    public void setChunkTime(long chunkTime) {
-        this.chunkTime = chunkTime;
+    public void reset() {
+        submitted.set(0L);
+        executed.set(0L);
+        completed.set(0L);
+        rejected.set(0L);
+        failed.set(0L);
+        minTime.set(Long.MAX_VALUE);
+        maxTime.set(Long.MIN_VALUE);
+        totalTime.set(0L);
     }
 
     @Override
@@ -102,8 +104,6 @@ public class PoolStatsData {
         builder.append(maxTime);
         builder.append(", totalTime=");
         builder.append(totalTime);
-        builder.append(", chunkTime=");
-        builder.append(chunkTime);
         builder.append("]");
         return builder.toString();
     }
@@ -132,8 +132,6 @@ public class PoolStatsData {
         if (getClass() != obj.getClass())
             return false;
         PoolStatsData other = (PoolStatsData) obj;
-        if (chunkTime != other.chunkTime)
-            return false;
         if (completed == null) {
             if (other.completed != null)
                 return false;

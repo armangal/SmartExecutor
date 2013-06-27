@@ -27,8 +27,8 @@ public class PoolConfiguration {
     /**
      * full pool name, will be used in monitoring software
      */
-    private String poolName; 
-    
+    private String poolName;
+
     /**
      * will be used for logs, should be unique
      */
@@ -38,44 +38,67 @@ public class PoolConfiguration {
      * core pool size
      */
     private Integer corePollSize = 5;
-    
+
     /**
      * max pool size
      */
     private Integer maxPoolSize = 5;
-    
+
     /**
      * queue size, default -1 means that SynchronousQueue will be used
      */
     private Integer queueSize = -1;
-    
+
     /**
      * how long to keep threads in pool above the core size.
      */
     private Long keepAliveTime = 60000l;
-    
+
     /**
      * the type of the pool
      */
     private PoolType poolType;
-    
+
     /**
      * how many chunks to hold in memory
      */
     private int chunks = 100;
-    
+
     /**
      * how often to "cut" a chunk
      */
     private long chunkInterval = 10000;
-    
+
     /**
-     * how often to print chunk stats to log, -1 means never
-     * any other positive number means that each X chunk iteration the stats will be printed
+     * how often to print chunk stats to log, -1 means never any other positive number means that each X chunk
+     * iteration the stats will be printed
      */
     private int logStats = 1; // default each chunk will be printed
 
     PoolConfiguration() {}
+
+    PoolConfiguration(String poolName,
+                      String poolNameShort,
+                      Integer corePollSize,
+                      Integer maxPoolSize,
+                      Integer queueSize,
+                      Long keepAliveTime,
+                      PoolType poolType,
+                      int chunks,
+                      long chunkInterval,
+                      int logStats) {
+        super();
+        this.poolName = poolName;
+        this.poolNameShort = poolNameShort;
+        this.corePollSize = corePollSize;
+        this.maxPoolSize = maxPoolSize;
+        this.queueSize = queueSize;
+        this.keepAliveTime = keepAliveTime;
+        this.poolType = poolType;
+        this.chunks = chunks;
+        this.chunkInterval = chunkInterval;
+        this.logStats = logStats;
+    }
 
     public void validate()
         throws ValidationException {
@@ -157,7 +180,5 @@ public class PoolConfiguration {
                .append("]");
         return builder.toString();
     }
-
-    
 
 }

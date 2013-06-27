@@ -18,6 +18,7 @@ package org.smexec;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.lang.management.ManagementFactory;
 import java.util.concurrent.Callable;
@@ -40,6 +41,7 @@ import org.smexec.configuration.PoolConfiguration;
 import org.smexec.jmx.ExecutorStats;
 import org.smexec.jmx.ExecutorStatsMXBean;
 import org.smexec.jmx.PoolStats;
+import org.smexec.jmx.PoolStatsMXBean;
 import org.smexec.pool.IGeneralThreadPool;
 import org.smexec.pool.ISmartScheduledThreadPool;
 import org.smexec.pool.ISmartThreadPool;
@@ -61,8 +63,6 @@ public class SmartExecutor {
     private ConcurrentHashMap<String, IGeneralThreadPool> threadPoolMap = new ConcurrentHashMap<String, IGeneralThreadPool>(0);
 
     private Config config;
-
-    private MBeanServer mbs;
 
     /**
      * Initializing SmartExecutor with default pools configurations.
@@ -86,32 +86,40 @@ public class SmartExecutor {
     public SmartExecutor(String configXMLresource)
         throws JAXBException, FileNotFoundException {
         InputStream configXML = Thread.currentThread().getContextClassLoader().getResourceAsStream(configXMLresource);
-        if (configXML == null) {
-            File f = new File(configXMLresource);
-            if (f.exists()) {
-                configXML = new FileInputStream(f);
-            } else {
-                throw new RuntimeException("Configuration file wan't found:" + configXMLresource);
+        try {
+            if (configXML == null) {
+                File f = new File(configXMLresource);
+                if (f.exists()) {
+                    configXML = new FileInputStream(f);
+                } else {
+                    throw new RuntimeException("Configuration file wan't found:" + configXMLresource);
+                }
+            }
+            JAXBContext context = JAXBContext.newInstance(Config.class);
+            config = (Config) context.createUnmarshaller().unmarshal(configXML);
+
+            logger.info("Initilized SmartExecutor with properties:{}", config);
+
+            config.validate();
+
+            logger.info("Configurations have been validated.");
+
+            try {
+                ExecutorStatsMXBean esBean = new ExecutorStats(this, config.getExecutorConfiguration().getName(), config.getExecutorConfiguration()
+                                                                                                                        .getDescription());
+                logger.info("Registered JMX bean for smart executor:{}", esBean.getName());
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
+            }
+        } finally {
+            if (configXML != null) {
+                try {
+                    configXML.close();
+                } catch (IOException e) {
+                    logger.error(e.getMessage(), e);
+                }
             }
         }
-        JAXBContext context = JAXBContext.newInstance(Config.class);
-        config = (Config) context.createUnmarshaller().unmarshal(configXML);
-
-        logger.info("Initilized SmartExecutor with properties:{}", config);
-
-        config.validate();
-
-        logger.info("Configurations have been validated.");
-
-        this.mbs = ManagementFactory.getPlatformMBeanServer();
-
-        try {
-            ExecutorStatsMXBean es = new ExecutorStats(this, config);
-            mbs.registerMBean(es, new ObjectName("org.smexec:type=SmartExecutor,name=" + config.getExecutorConfiguration().getName()));
-        } catch (Exception e) {
-            logger.error(e.getMessage(), e);
-        }
-
     }
 
     /**
@@ -229,7 +237,7 @@ public class SmartExecutor {
         if (threadPoolMap.containsKey(poolName)) {
             return threadPoolMap.get(poolName);
         } else {
-            synchronized (threadPoolMap) {
+            synchronized (this.getClass()) {
                 if (threadPoolMap.containsKey(poolName)) {
                     return threadPoolMap.get(poolName);
                 } else {
@@ -237,9 +245,8 @@ public class SmartExecutor {
                     threadPoolMap.put(poolName, threadPool);
 
                     try {
-                        PoolStats mbean = new PoolStats(threadPool);
-                        mbs.registerMBean(mbean, new ObjectName("org.smexec:type=SmartExecutor.Pools,name=" + threadPool.getPoolConfiguration().getPoolName()
-                                                                + "(" + threadPool.getPoolConfiguration().getPoolNameShort() + ")"));
+                        PoolStatsMXBean poolStatsMXBean = new PoolStats(threadPool);
+                        logger.info("Registered JMX bean for smart pool:{}", poolStatsMXBean.getName());
                     } catch (Exception e) {
                         logger.error(e.getMessage(), e);
                     }

@@ -21,7 +21,6 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.slf4j.Logger;
@@ -76,36 +75,6 @@ final class ThreadPoolHelper {
 
     protected static <V> SmartCallable<V> wrapCallable(Callable<V> c, TaskMetadata taskMetadata, ThreadPoolStats poolStats) {
         return new SmartCallable<V>(c, taskMetadata, poolStats);
-    }
-
-    /**
-     * schedules a repeated task that will "cut" chunks of statistics in order to preserve periodical data
-     * 
-     * @param poolConf
-     * @param poolStats
-     */
-    protected static void scheduleChunker(final PoolConfiguration poolConf, final ThreadPoolStats poolStats) {
-
-        // Schedule custom chunker thread
-        pool.scheduleWithFixedDelay(new Runnable() {
-
-            @Override
-            public void run() {
-                String name = Thread.currentThread().getName();
-                try {
-                    Thread.currentThread().setName("SE_CHUNKER_" + poolConf.getPoolNameShort());
-                    poolStats.cutChunk();
-
-                } catch (Exception e) {
-                    logger.error(e.getMessage(), e);
-
-                } finally {
-                    Thread.currentThread().setName(name);
-                }
-            }
-
-        }, poolConf.getChunkInterval(), poolConf.getChunkInterval(), TimeUnit.MILLISECONDS);
-
     }
 
     protected static ThreadFactory getThreadFactory(final PoolConfiguration poolConf) {

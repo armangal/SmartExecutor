@@ -15,42 +15,38 @@
  */
 package org.smexec.pool;
 
-import java.util.Calendar;
-import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.smexec.jmx.AbstractJmxStatDataHolder;
+import org.smexec.jmx.TaskExecutionStats;
 
-public class ThreadPoolStats {
+public class ThreadPoolStats
+    extends AbstractJmxStatDataHolder<TaskExecutionStats> {
 
     private static Logger logger = LoggerFactory.getLogger(ThreadPoolStats.class);
 
     /**
-     * the total stats about the pool
+     * the global stats about the pool
      */
     private final PoolStatsData totalData = new PoolStatsData();
 
-    private final String poolName;
     /**
-     * the amount of chunks to keep in memory
+     * holds the current stats until new one is cutt
      */
-    private final int chunks;
+    private final PoolStatsData currentStats = new PoolStatsData();
+
+    private final String poolName;
 
     /**
      * how often to log stats
      */
     private final int logStats;
-
     private int chunksCounter = 0;
-
-    /**
-     * the actual chunks
-     */
-    private LinkedList<PoolStatsData> history = new LinkedList<PoolStatsData>();
 
     /**
      * statistics about tasks
@@ -62,42 +58,19 @@ public class ThreadPoolStats {
      * @param poolName
      */
     public ThreadPoolStats(final int chunks, final int logStats, final String poolName) {
-        // keeping one more for current stats
-        this.chunks = chunks + 1;
+        super(chunks, 20L, poolName);
         this.logStats = logStats;
         this.poolName = poolName;
-        // adding the current one
-        history.add(new PoolStatsData());
     }
 
     /**
      * @return the current chunk where stats are aggregated
      */
     private PoolStatsData getCurrentChunk() {
-        return history.getLast();
+        return currentStats;
     }
 
-    /**
-     * creates new chunk and cleans the history if needed
-     */
-    public void cutChunk() {
-        PoolStatsData currentChunk = getCurrentChunk();
-        history.add(new PoolStatsData());
-
-        Calendar calendar = Calendar.getInstance();
-        currentChunk.setChunkTime((calendar.get(Calendar.HOUR_OF_DAY) * 10000) + (calendar.get(Calendar.MINUTE) * 100) + calendar.get(Calendar.SECOND));
-        if (history.size() > chunks) {
-            history.remove();
-        }
-
-        chunksCounter++;
-        if (logStats > 0 && chunksCounter % logStats == 0) {
-            logger.info("ThreadPoolStats for pool:{}, {}", poolName, this);
-            chunksCounter = 0;
-        }
-    }
-
-    public long incrementSubmitted(String taskName) {
+    public long incrementSubmitted(final String taskName) {
         getCurrentChunk().getSubmitted().incrementAndGet();
         getTasksStats(taskName).getSubmitted().incrementAndGet();
         return totalData.getSubmitted().incrementAndGet();
@@ -108,7 +81,7 @@ public class ThreadPoolStats {
         return totalData.getSubmitted().addAndGet(delta);
     }
 
-    public long incrementRejected(String taskName) {
+    public long incrementRejected(final String taskName) {
         getCurrentChunk().getRejected().incrementAndGet();
         getTasksStats(taskName).getRejected().incrementAndGet();
         return totalData.getRejected().incrementAndGet();
@@ -119,25 +92,25 @@ public class ThreadPoolStats {
         return totalData.getRejected().addAndGet(delta);
     }
 
-    public long incrementExecuted(String taskName) {
+    public long incrementExecuted(final String taskName) {
         getCurrentChunk().getExecuted().incrementAndGet();
         getTasksStats(taskName).getExecuted().incrementAndGet();
         return totalData.getExecuted().incrementAndGet();
     }
 
-    public long incrementFailed(String taskName) {
+    public long incrementFailed(final String taskName) {
         getCurrentChunk().getFailed().incrementAndGet();
         getTasksStats(taskName).getFailed().incrementAndGet();
         return totalData.getFailed().incrementAndGet();
     }
 
-    public long incrementCompleted(String taskName) {
+    public long incrementCompleted(final String taskName) {
         getCurrentChunk().getCompleted().incrementAndGet();
         getTasksStats(taskName).getCompleted().incrementAndGet();
         return totalData.getCompleted().incrementAndGet();
     }
 
-    public void updateTimings(long executionDuration, String taskName) {
+    public void updateTimings(long executionDuration, final String taskName) {
         // update total stats
         updateTimings(totalData, executionDuration);
 
@@ -202,14 +175,10 @@ public class ThreadPoolStats {
         return totalData.getAvgTime();
     }
 
-    public LinkedList<PoolStatsData> getHistory() {
-        return history;
-    }
-
-    private PoolStatsData getTasksStats(String taskName) {
+    private PoolStatsData getTasksStats(final String taskName) {
         PoolStatsData poolStatsData = taskStatsMap.get(taskName);
         if (poolStatsData == null) {
-            synchronized (taskStatsMap) {
+            synchronized (this.getClass()) {
                 if (taskStatsMap.containsKey(taskName)) {
                     poolStatsData = taskStatsMap.get(taskName);
                 } else {
@@ -243,17 +212,35 @@ public class ThreadPoolStats {
                .append(", avgTime=")
                .append(totalData.getAvgTime())
                .append("]");
-
-        PoolStatsData h = null;
-        if (history.size() > 1) {
-            Iterator<PoolStatsData> iterator = history.descendingIterator();
-            iterator.next();
-            h = iterator.next(); // take the one before last element, beacuse the last one will be empty
-        } else {
-            h = getCurrentChunk();
-        }
-        builder.append("\nChunk: [").append(h.toString()).append("]");
         return builder.toString();
+    }
+
+    @Override
+    protected TaskExecutionStats[] getStatsAsArray(List<TaskExecutionStats> list) {
+        return list.toArray(new TaskExecutionStats[list.size()]);
+    }
+
+    @Override
+    protected TaskExecutionStats snapshotStats() {
+        PoolStatsData currentChunk = getCurrentChunk();
+
+        TaskExecutionStats tes = new TaskExecutionStats(lastStartTime,
+                                                        getCurrentTime(),
+                                                        currentChunk.getSubmitted().getAndSet(0L),
+                                                        currentChunk.getExecuted().getAndSet(0L),
+                                                        currentChunk.getCompleted().getAndSet(0L),
+                                                        currentChunk.getRejected().getAndSet(0L),
+                                                        currentChunk.getFailed().getAndSet(0L),
+                                                        currentChunk.getMinTime().getAndSet(0L),
+                                                        currentChunk.getMaxTime().getAndSet(0L),
+                                                        currentChunk.getTotalTime().getAndSet(0L));
+        chunksCounter++;
+        if (logStats > 0 && chunksCounter % logStats == 0) {
+            logger.info("ThreadPoolStats for pool:{}, {}", poolName, this);
+            chunksCounter = 0;
+        }
+
+        return tes;
     }
 
 }

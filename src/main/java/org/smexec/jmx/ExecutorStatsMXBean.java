@@ -15,11 +15,16 @@
  */
 package org.smexec.jmx;
 
+/**
+ * represents one smart executor
+ * 
+ * @author armang
+ */
 public interface ExecutorStatsMXBean {
 
-	String getName();
+    String getName();
 
-	String getDescription();
-	
-	int getActivePools();
+    String getDescription();
+
+    int getActivePools();
 }

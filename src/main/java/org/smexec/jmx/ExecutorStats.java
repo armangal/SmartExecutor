@@ -16,28 +16,37 @@
 package org.smexec.jmx;
 
 import org.smexec.SmartExecutor;
-import org.smexec.configuration.Config;
 
+/**
+ * represents one smart executor
+ * 
+ * @author armang
+ */
 public class ExecutorStats
+    extends AbstractStats
     implements ExecutorStatsMXBean {
 
-    private final SmartExecutor smartExecutor;
-    private final Config config;
+    private final static String BEAN_NAME = "org.smexec:type=SmartExecutor,name=";
 
-    public ExecutorStats(SmartExecutor smartExecutor, Config config) {
-        super();
+    private final SmartExecutor smartExecutor;
+    private final String name;
+    private final String description;
+
+    public ExecutorStats(final SmartExecutor smartExecutor, final String name, final String description) {
+        super(BEAN_NAME + name);
         this.smartExecutor = smartExecutor;
-        this.config = config;
+        this.description = description;
+        this.name = name;
     }
 
     @Override
     public String getName() {
-        return config.getExecutorConfiguration().getName();
+        return name;
     }
 
     @Override
     public String getDescription() {
-        return config.getExecutorConfiguration().getDescription();
+        return description;
     }
 
     @Override

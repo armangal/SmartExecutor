@@ -17,6 +17,8 @@ package org.smexec.jmx;
 
 public interface PoolStatsMXBean {
 
+    String getName();
+    
     void printStats();
 
     Long getSubmitted();
@@ -59,9 +61,8 @@ public interface PoolStatsMXBean {
     int getLargestPoolSize();
 
     String[] getTaskNames();
-
-    ExecutionTimeStats[] getExecutionTimeStats();
     
     TaskExecutionStats[] getTaskExecutionStats();
 
+    TaskExecutionStats[] getLastTaskExecutionStats(long lastUpdate);
 }
