@@ -57,8 +57,8 @@ public class ThreadPoolStats
      * @param chunks - the amount of chunks to keep in memory
      * @param poolName
      */
-    public ThreadPoolStats(final int chunks, final int logStats, final String poolName) {
-        super(chunks, 20L, poolName);
+    public ThreadPoolStats(final int chunks,  final long interval, final int logStats, final String poolName) {
+        super(chunks, interval, poolName);
         this.logStats = logStats;
         this.poolName = poolName;
     }

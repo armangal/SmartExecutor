@@ -18,13 +18,9 @@ package org.smexec.pool.impl;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.concurrent.Callable;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.smexec.TaskMetadata;
 import org.smexec.configuration.PoolConfiguration;
 import org.smexec.pool.ThreadPoolStats;
@@ -33,21 +29,6 @@ import org.smexec.wrappers.SmartCallable;
 import org.smexec.wrappers.SmartRunnable;
 
 final class ThreadPoolHelper {
-
-    private static Logger logger = LoggerFactory.getLogger(ThreadPoolHelper.class);
-
-    /**
-     * local pool to be used for chunkers
-     */
-    private static ScheduledExecutorService pool = Executors.newScheduledThreadPool(2, new ThreadFactory() {
-
-        int trn = 0;
-
-        @Override
-        public Thread newThread(Runnable r) {
-            return new Thread(r, "SE_CHUNKER_" + trn++);
-        }
-    });
 
     protected static <T> Collection<SmartCallable<T>> wrapCallable(Collection<? extends Callable<T>> tasks, TaskMetadata taskMetadata, ThreadPoolStats poolStats) {
         Collection<SmartCallable<T>> smartTasks = new HashSet<SmartCallable<T>>(tasks.size());

@@ -39,7 +39,7 @@ public class SmartScheduledThreadPool
         super(poolConf.getCorePollSize(), ThreadPoolHelper.getThreadFactory(poolConf));
 
         this.poolConf = poolConf;
-        this.poolStats = new ThreadPoolStats(poolConf.getChunks(), poolConf.getLogStats(), poolConf.getPoolName());
+        this.poolStats = new ThreadPoolStats(poolConf.getChunks(), poolConf.getChunkInterval(), poolConf.getLogStats(), poolConf.getPoolName());
 
     }
 

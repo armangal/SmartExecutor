@@ -51,7 +51,7 @@ public class SmartThreadPool
                               : new LinkedBlockingQueue<Runnable>(poolConf.getQueueSize()), ThreadPoolHelper.getThreadFactory(poolConf));
 
         this.poolConf = poolConf;
-        this.poolStats = new ThreadPoolStats(poolConf.getChunks(), poolConf.getLogStats(), poolConf.getPoolName());
+        this.poolStats = new ThreadPoolStats(poolConf.getChunks(), poolConf.getChunkInterval(), poolConf.getLogStats(), poolConf.getPoolName());
 
     }
 
