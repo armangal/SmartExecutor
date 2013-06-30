@@ -25,18 +25,25 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Config {
 
-	@XmlElement(name = "executor")
-	private ExecutorConfiguration executorConfiguration;
+    @XmlElement(name = "executor")
+    private ExecutorConfiguration executorConfiguration;
 
-	public Config() {
-	}
+    public Config() {}
 
-	public ExecutorConfiguration getExecutorConfiguration() {
-		return executorConfiguration;
-	}
-	
-	public void validate() throws ValidationException {
-	    executorConfiguration.validate();
-	}
+    public ExecutorConfiguration getExecutorConfiguration() {
+        return executorConfiguration;
+    }
+
+    public void validate()
+        throws ValidationException {
+        executorConfiguration.validate();
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("Config [executorConfiguration=").append(executorConfiguration).append("]");
+        return builder.toString();
+    }
 
 }

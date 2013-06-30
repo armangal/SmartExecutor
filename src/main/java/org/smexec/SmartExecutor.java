@@ -20,7 +20,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.management.ManagementFactory;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -29,8 +28,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-import javax.management.MBeanServer;
-import javax.management.ObjectName;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 
@@ -231,6 +228,10 @@ public class SmartExecutor {
 
     public ExecutorService getThreadPool(String poolName) {
         return getPool(poolName);
+    }
+
+    public ExecutorService getThreadPool(IPoolName poolName) {
+        return getPool(poolName.getPoolName());
     }
 
     private IGeneralThreadPool getPool(String poolName) {
