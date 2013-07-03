@@ -54,6 +54,7 @@ public class SmartExecutor {
 
     private static final Logger logger = LoggerFactory.getLogger("SE");
 
+    private static final String PROPERTY_CONFIG_FILE = "smart.config.location";
     private static final String defaultXMLConfName = "SmartExecutor-default.xml";
     private static final String defaultScheduledPoolName = "Scheduled";
 
@@ -86,11 +87,14 @@ public class SmartExecutor {
         try {
             if (configXML == null) {
                 File f = new File(configXMLresource);
-                if (f.exists()) {
-                    configXML = new FileInputStream(f);
-                } else {
+                if (!f.exists() && System.getProperty(PROPERTY_CONFIG_FILE) != null) {
+                    f = new File(System.getProperty(PROPERTY_CONFIG_FILE));
+                }
+
+                if (!f.exists()) {
                     throw new RuntimeException("Configuration file wan't found:" + configXMLresource);
                 }
+                configXML = new FileInputStream(f);
             }
             JAXBContext context = JAXBContext.newInstance(Config.class);
             config = (Config) context.createUnmarshaller().unmarshal(configXML);
