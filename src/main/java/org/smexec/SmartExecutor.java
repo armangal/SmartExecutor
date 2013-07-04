@@ -82,10 +82,11 @@ public class SmartExecutor {
      */
     public SmartExecutor(String configXMLresource)
         throws JAXBException, FileNotFoundException {
+        logger.info("Looking from configuration file:{}", configXMLresource);
         InputStream configXML;
         Thread.currentThread().getContextClassLoader();
         ClassLoader systemClassLoader = ClassLoader.getSystemClassLoader();
-        
+
         configXML = systemClassLoader.getResourceAsStream(configXMLresource);
         if (configXML == null) {
             logger.info("Config file wasn't found by systemClassLoader");
@@ -97,7 +98,7 @@ public class SmartExecutor {
                 } else {
                     logger.info("Config file was found by :{}", contextClassLoader);
                 }
-                
+
                 contextClassLoader = contextClassLoader.getParent();
             } while (configXML == null && contextClassLoader != null);
         }
@@ -105,6 +106,7 @@ public class SmartExecutor {
             if (configXML == null) {
                 File f = new File(configXMLresource);
                 if (!f.exists() && System.getProperty(PROPERTY_CONFIG_FILE) != null) {
+                    logger.info("Config file wasn't found as file.");
                     f = new File(System.getProperty(PROPERTY_CONFIG_FILE));
                 }
 
