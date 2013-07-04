@@ -56,7 +56,6 @@ public class SmartExecutor {
 
     private static final String PROPERTY_CONFIG_FILE = "smart.config.location";
     private static final String defaultXMLConfName = "SmartExecutor-default.xml";
-    private static final String defaultScheduledPoolName = "Scheduled";
 
     private ConcurrentHashMap<String, IGeneralThreadPool> threadPoolMap = new ConcurrentHashMap<String, IGeneralThreadPool>(0);
 
@@ -83,7 +82,25 @@ public class SmartExecutor {
      */
     public SmartExecutor(String configXMLresource)
         throws JAXBException, FileNotFoundException {
-        InputStream configXML = Thread.currentThread().getContextClassLoader().getResourceAsStream(configXMLresource);
+        InputStream configXML;
+        Thread.currentThread().getContextClassLoader();
+        ClassLoader systemClassLoader = ClassLoader.getSystemClassLoader();
+        
+        configXML = systemClassLoader.getResourceAsStream(configXMLresource);
+        if (configXML == null) {
+            logger.info("Config file wasn't found by systemClassLoader");
+            ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+            do {
+                configXML = contextClassLoader.getResourceAsStream(configXMLresource);
+                if (configXML == null) {
+                    logger.info("Config file wasn't found by :{}", contextClassLoader);
+                } else {
+                    logger.info("Config file was found by :{}", contextClassLoader);
+                }
+                
+                contextClassLoader = contextClassLoader.getParent();
+            } while (configXML == null && contextClassLoader != null);
+        }
         try {
             if (configXML == null) {
                 File f = new File(configXMLresource);
@@ -92,7 +109,9 @@ public class SmartExecutor {
                 }
 
                 if (!f.exists()) {
-                    throw new RuntimeException("Configuration file wan't found:" + configXMLresource);
+                    RuntimeException rte = new RuntimeException("Configuration file wan't found:" + configXMLresource);
+                    logger.error(rte.getMessage(), rte);
+                    throw rte;
                 }
                 configXML = new FileInputStream(f);
             }
