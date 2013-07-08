@@ -15,8 +15,6 @@
  */
 package org.smexec;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -44,6 +42,7 @@ import org.smexec.pool.ISmartScheduledThreadPool;
 import org.smexec.pool.ISmartThreadPool;
 import org.smexec.pool.impl.SmartScheduledThreadPool;
 import org.smexec.pool.impl.SmartThreadPool;
+import org.smexec.utils.ConfigLoader;
 import org.smexec.utils.Utils;
 
 /**
@@ -53,9 +52,6 @@ import org.smexec.utils.Utils;
 public class SmartExecutor {
 
     private static final Logger logger = LoggerFactory.getLogger("SE");
-
-    private static final String PROPERTY_CONFIG_FILE = "smart.config.location";
-    private static final String defaultXMLConfName = "SmartExecutor-default.xml";
 
     private ConcurrentHashMap<String, IGeneralThreadPool> threadPoolMap = new ConcurrentHashMap<String, IGeneralThreadPool>(0);
 
@@ -69,54 +65,27 @@ public class SmartExecutor {
      */
     public SmartExecutor()
         throws JAXBException, FileNotFoundException {
-        this(defaultXMLConfName);
+        this(null);
     }
 
     /**
      * Initializing SmartExecutor with custom configuration file
      * 
      * @param configXMLresource, if the file is in classPath, then only name is enough, if the file is located
-     *            out of CP, full file path should be provided
+     *            out of CP, full file path should be provided or full resource name like: <b>com/example/work/config.xml</b>
      * @throws JAXBException
      * @throws FileNotFoundException
      */
     public SmartExecutor(String configXMLresource)
         throws JAXBException, FileNotFoundException {
         logger.info("Looking from configuration file:{}", configXMLresource);
-        InputStream configXML;
-        Thread.currentThread().getContextClassLoader();
-        ClassLoader systemClassLoader = ClassLoader.getSystemClassLoader();
-
-        configXML = systemClassLoader.getResourceAsStream(configXMLresource);
-        if (configXML == null) {
-            logger.info("Config file wasn't found by systemClassLoader");
-            ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
-            do {
-                configXML = contextClassLoader.getResourceAsStream(configXMLresource);
-                if (configXML == null) {
-                    logger.info("Config file wasn't found by :{}", contextClassLoader);
-                } else {
-                    logger.info("Config file was found by :{}", contextClassLoader);
-                }
-
-                contextClassLoader = contextClassLoader.getParent();
-            } while (configXML == null && contextClassLoader != null);
-        }
+        InputStream configXML = null;
         try {
+            configXML = new ConfigLoader().loadConfig(configXMLresource);
             if (configXML == null) {
-                File f = new File(configXMLresource);
-                if (!f.exists() && System.getProperty(PROPERTY_CONFIG_FILE) != null) {
-                    logger.info("Config file wasn't found as file.");
-                    f = new File(System.getProperty(PROPERTY_CONFIG_FILE));
-                }
-
-                if (!f.exists()) {
-                    RuntimeException rte = new RuntimeException("Configuration file wan't found:" + configXMLresource);
-                    logger.error(rte.getMessage(), rte);
-                    throw rte;
-                }
-                configXML = new FileInputStream(f);
+                throw new RuntimeException("Config file wasn't found, check previous exceptions");
             }
+
             JAXBContext context = JAXBContext.newInstance(Config.class);
             config = (Config) context.createUnmarshaller().unmarshal(configXML);
 
