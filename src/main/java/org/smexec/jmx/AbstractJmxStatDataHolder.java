@@ -113,7 +113,7 @@ public abstract class AbstractJmxStatDataHolder<T extends AbstractJmxStatEntry> 
 
         synchronized (stats) {
             stats.addFirst(statEntry);
-            if (stats.size() > this.maxStatEntriesInMemory) {
+            while (stats.size() > this.maxStatEntriesInMemory) {
                 stats.removeLast();
             }
         }
