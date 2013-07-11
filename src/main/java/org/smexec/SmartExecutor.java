@@ -72,7 +72,8 @@ public class SmartExecutor {
      * Initializing SmartExecutor with custom configuration file
      * 
      * @param configXMLresource, if the file is in classPath, then only name is enough, if the file is located
-     *            out of CP, full file path should be provided or full resource name like: <b>com/example/work/config.xml</b>
+     *            out of CP, full file path should be provided or full resource name like:
+     *            <b>com/example/work/config.xml</b>
      * @throws JAXBException
      * @throws FileNotFoundException
      */
@@ -240,7 +241,7 @@ public class SmartExecutor {
                     threadPoolMap.put(poolName, threadPool);
 
                     try {
-                        PoolStatsMXBean poolStatsMXBean = new PoolStats(threadPool);
+                        PoolStatsMXBean poolStatsMXBean = new PoolStats(config.getExecutorConfiguration().getName(), threadPool);
                         logger.info("Registered JMX bean for smart pool:{}", poolStatsMXBean.getName());
                     } catch (Exception e) {
                         logger.error(e.getMessage(), e);

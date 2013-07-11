@@ -16,8 +16,8 @@
 package org.smexec;
 
 /**
- * One of the options to control the destination thread suffix name is to implement this interface by Runnable
- * or Callble and provide the thread suffix name
+ * One of the options to control the destination thread name suffix is to implement this interface by Runnable
+ * or Callble and provide the thread name suffix.
  */
 public interface IThreadNameSuffixAware {
 

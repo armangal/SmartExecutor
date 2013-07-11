@@ -15,7 +15,13 @@
  */
 package org.smexec;
 
-
+/**
+ * In order to make it easy for the library to define it's own pool names but still keep it in order and easy
+ * manageable, the framework limits the api the enums implementing this interface.
+ * 
+ * @author armang
+ */
 public interface IPoolName {
+
     String getPoolName();
 }

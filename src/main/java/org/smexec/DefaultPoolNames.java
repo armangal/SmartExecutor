@@ -15,6 +15,11 @@
  */
 package org.smexec;
 
+/**
+ * default names for default pools defined in default configuration XML.
+ * 
+ * @author armang
+ */
 public enum DefaultPoolNames implements IPoolName {
 
     DEFAULT("default");

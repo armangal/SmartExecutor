@@ -16,8 +16,8 @@
 package org.smexec;
 
 /**
- * One of the options to control the destination thread pool is to implement this interface by Runnable or Callble and provide the
- * pool name
+ * One of the options to control the destination thread pool is to implement this interface by Runnable or
+ * Callble and provide the pool name where the task should be executed.
  */
 public interface IThreadPoolAware {
 

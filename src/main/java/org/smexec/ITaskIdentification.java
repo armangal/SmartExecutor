@@ -16,8 +16,9 @@
 package org.smexec;
 
 /**
- * The framework collect statistics about tasks executed by it. The deafult task identification is it's full
- * class name but here we give ability to use other name for those statistics
+ * The framework collect statistics about tasks executed by it. The default task identification is it's full
+ * class name but here we give ability to provide other name under it those statistics will be collected and
+ * shown in monitoring system and logs.
  */
 public interface ITaskIdentification {
 

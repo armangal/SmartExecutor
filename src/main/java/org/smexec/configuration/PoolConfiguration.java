@@ -30,6 +30,11 @@ public class PoolConfiguration {
     private String poolName;
 
     /**
+     * Optional description, will be visible via jmx as well
+     */
+    private String description;
+
+    /**
      * will be used for logs, should be unique
      */
     private String poolNameShort;
@@ -78,6 +83,7 @@ public class PoolConfiguration {
     PoolConfiguration() {}
 
     PoolConfiguration(String poolName,
+                      String description,
                       String poolNameShort,
                       Integer corePollSize,
                       Integer maxPoolSize,
@@ -89,6 +95,7 @@ public class PoolConfiguration {
                       int logStats) {
         super();
         this.poolName = poolName;
+        this.description = description;
         this.poolNameShort = poolNameShort;
         this.corePollSize = corePollSize;
         this.maxPoolSize = maxPoolSize;
@@ -116,6 +123,10 @@ public class PoolConfiguration {
 
     public String getPoolName() {
         return poolName;
+    }
+
+    public String getDescription() {
+        return description;
     }
 
     public String getPoolNameShort() {
@@ -159,6 +170,8 @@ public class PoolConfiguration {
         StringBuilder builder = new StringBuilder();
         builder.append("PoolConfiguration [poolName=")
                .append(poolName)
+               .append(", description=")
+               .append(description)
                .append(", poolNameShort=")
                .append(poolNameShort)
                .append(", corePollSize=")

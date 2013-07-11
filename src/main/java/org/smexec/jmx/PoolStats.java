@@ -31,16 +31,29 @@ public class PoolStats
 
     private final IGeneralThreadPool stp;
 
-    public PoolStats(final IGeneralThreadPool stp) {
-        super(BEAN_NAME + stp.getPoolConfiguration().getPoolName() + "(" + stp.getPoolConfiguration().getPoolNameShort() + ")");
+    final String smartExecutorName;
 
+    public PoolStats(final String smartExecutorName, final IGeneralThreadPool stp) {
+        super(BEAN_NAME + smartExecutorName + "." + stp.getPoolConfiguration().getPoolName() + "(" + stp.getPoolConfiguration().getPoolNameShort() + ")");
+
+        this.smartExecutorName = smartExecutorName;
         logger = LoggerFactory.getLogger("PoolStats_" + stp.getPoolConfiguration().getPoolNameShort());
         this.stp = stp;
     }
 
     @Override
+    public String getSmartExecutorName() {
+        return smartExecutorName;
+    }
+
+    @Override
     public String getName() {
         return stp.getPoolConfiguration().getPoolName() + "(" + stp.getPoolConfiguration().getPoolNameShort() + ")";
+    }
+
+    @Override
+    public String getDescription() {
+        return stp.getPoolConfiguration().getDescription();
     }
 
     @Override
