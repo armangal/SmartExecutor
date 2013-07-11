@@ -18,8 +18,11 @@ package org.smexec;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CompletionService;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
@@ -276,8 +279,28 @@ public class SmartExecutor {
         return sb.toString();
     }
 
+    /**
+     * @return currently registered thread pools
+     */
     public int getActivePools() {
         return threadPoolMap.size();
     }
 
+    /**
+     * @param poolName - thread pool to be used with CompletionService
+     * @return - extended {@link ExecutorCompletionService} that allows to track stats
+     */
+    public <V> CompletionService<V> getCompletionService(IPoolName poolName) {
+        return new SmartExecutorCompletionService<V>((ISmartThreadPool) getPool(poolName.getPoolName()));
+    }
+
+    /**
+     * @param poolName - thread pool to be used with CompletionService
+     * @param completionQueue - the queue to use as the completion queue normally one dedicated for use by
+     *            this service
+     * @return extended {@link ExecutorCompletionService} that allows to track stats
+     */
+    public <V> CompletionService<V> getCompletionService(IPoolName poolName, BlockingQueue<Future<V>> completionQueue) {
+        return new SmartExecutorCompletionService<V>((ISmartThreadPool) getPool(poolName.getPoolName()), completionQueue);
+    }
 }
