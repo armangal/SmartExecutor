@@ -16,93 +16,41 @@
 package org.smexec.jmx;
 
 import java.beans.ConstructorProperties;
+import java.util.Map;
 
 public class TaskExecutionStats
     extends AbstractJmxStatEntry {
 
-    private long submitted;
-    private long executed;
-    private long completed;
-    private long rejected;
-    private long failed;
+    private TaskExecutionChunk globalStats;
+    private Map<String, TaskExecutionChunk> taskStatsMap;
 
-    private long min;
-    private long max;
-    private long totalTime;
-
-    @ConstructorProperties({"startTime", "endTime", "submitted", "executed", "completed", "rejected", "failed", "min", "max", "totalTime"})
-    public TaskExecutionStats(long startTime,
-                              long endTime,
-                              long submitted,
-                              long executed,
-                              long completed,
-                              long rejected,
-                              long failed,
-                              long min,
-                              long max,
-                              long totalTime) {
+    @ConstructorProperties({"startTime", "endTime", "globalStats", "taskStatsMap"})
+    public TaskExecutionStats(long startTime, long endTime, TaskExecutionChunk globalStats, Map<String, TaskExecutionChunk> taskStatsMap) {
         super(startTime, endTime);
-        this.submitted = submitted;
-        this.executed = executed;
-        this.completed = completed;
-        this.rejected = rejected;
-        this.failed = failed;
-        this.min = min;
-        this.max = max;
-        this.totalTime = totalTime;
+
+        this.globalStats = globalStats;
+        this.taskStatsMap = taskStatsMap;
     }
 
-    public long getSubmitted() {
-        return submitted;
+    public TaskExecutionChunk getGlobalStats() {
+        return globalStats;
     }
 
-    public long getExecuted() {
-        return executed;
-    }
-
-    public long getCompleted() {
-        return completed;
-    }
-
-    public long getRejected() {
-        return rejected;
-    }
-
-    public long getFailed() {
-        return failed;
-    }
-
-    public long getMin() {
-        return min;
-    }
-
-    public long getMax() {
-        return max;
-    }
-
-    public long getTotalTime() {
-        return totalTime;
+    public Map<String, TaskExecutionChunk> getTaskStatsMap() {
+        return taskStatsMap;
     }
 
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append("TaskExecutionStats [submitted=")
-               .append(submitted)
-               .append(", executed=")
-               .append(executed)
-               .append(", completed=")
-               .append(completed)
-               .append(", rejected=")
-               .append(rejected)
-               .append(", failed=")
-               .append(failed)
-               .append(", min=")
-               .append(min)
-               .append(", max=")
-               .append(max)
-               .append(", totalTime=")
-               .append(totalTime)
+        builder.append("TaskExecutionStats [globalStats=")
+               .append(globalStats)
+               .append(", taskStatsMap=")
+               .append(taskStatsMap)
+               .append(", endTime=")
+               .append(endTime)
+               .append(", cpuUsage=")
+               .append(cpuUsage)
                .append("]");
         return builder.toString();
     }
