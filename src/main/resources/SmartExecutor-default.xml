@@ -8,6 +8,7 @@
 			<pool>
 				<poolName>Default</poolName>
 				<poolNameShort>DTP</poolNameShort>
+				<description>Detailed description, deafult thread pool</description>
 				<corePollSize>2</corePollSize>
 				<maxPoolSize>3</maxPoolSize>
 				<queueSize>100</queueSize>
@@ -20,6 +21,7 @@
 			<pool>
 				<poolName>Scheduled</poolName>
 				<poolNameShort>STP</poolNameShort>
+				<description>Detailed description, Scheduled thread pool</description>
 				<corePollSize>5</corePollSize>
 				<poolType>scheduled</poolType>
 				<chunks>100</chunks>
@@ -29,6 +31,7 @@
 			<pool>
 				<poolName>Cached</poolName>
 				<poolNameShort>CTP</poolNameShort>
+				<description>Detailed description, Cached thread pool</description>
 				<poolType>cached</poolType>
 				<chunks>100</chunks>
 				<chunkInterval>10000</chunkInterval>
