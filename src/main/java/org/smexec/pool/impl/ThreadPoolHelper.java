@@ -15,12 +15,15 @@
  */
 package org.smexec.pool.impl;
 
+import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.smexec.TaskMetadata;
 import org.smexec.configuration.PoolConfiguration;
 import org.smexec.pool.ThreadPoolStats;
@@ -28,7 +31,14 @@ import org.smexec.utils.Utils;
 import org.smexec.wrappers.SmartCallable;
 import org.smexec.wrappers.SmartRunnable;
 
+/**
+ * A helper class with useful methods
+ * 
+ * @author armang
+ */
 final class ThreadPoolHelper {
+
+    private static Logger logger = LoggerFactory.getLogger("ThreadPoolHelper");
 
     protected static <T> Collection<SmartCallable<T>> wrapCallable(Collection<? extends Callable<T>> tasks, TaskMetadata taskMetadata, ThreadPoolStats poolStats) {
         Collection<SmartCallable<T>> smartTasks = new HashSet<SmartCallable<T>>(tasks.size());
@@ -58,6 +68,23 @@ final class ThreadPoolHelper {
         return new SmartCallable<V>(c, taskMetadata, poolStats);
     }
 
+    /**
+     * UncaughtExceptionHandler to be used for each thread created by the framework
+     */
+    private static UncaughtExceptionHandler eh = new UncaughtExceptionHandler() {
+
+        @Override
+        public void uncaughtException(Thread t, Throwable e) {
+            logger.error("Thread with name:" + t.getName() + " had uncaught execption:" + e.getMessage(), e);
+        }
+    };
+
+    /**
+     * helper method for creating thread factory
+     * 
+     * @param poolConf - configurations for a destination thread pool
+     * @return - factory implementation
+     */
     protected static ThreadFactory getThreadFactory(final PoolConfiguration poolConf) {
         return new ThreadFactory() {
 
@@ -65,7 +92,9 @@ final class ThreadPoolHelper {
 
             @Override
             public Thread newThread(Runnable r) {
-                return new Thread(r, poolConf.getPoolType().getThreadNamePrefix() + poolConf.getPoolNameShort() + "_" + threadNumber.incrementAndGet());
+                Thread thread = new Thread(r, poolConf.getPoolType().getThreadNamePrefix() + poolConf.getPoolNameShort() + "_" + threadNumber.incrementAndGet());
+                thread.setUncaughtExceptionHandler(eh);
+                return thread;
             }
         };
 
