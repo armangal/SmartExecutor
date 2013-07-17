@@ -19,8 +19,8 @@
 
 	<licenses>
 		<license>
-			<name>The Apache Software License, Version 2.0</name>
-			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<name>CC0 1.0 Universal (CC0 1.0) </name>
+			<url>http://creativecommons.org/publicdomain/zero/1.0/</url>
 			<distribution>repo</distribution>
 		</license>
 	</licenses>
@@ -165,6 +165,7 @@
 				<executions>
 					<execution>
 						<goals>
+							<goal>remove</goal>
 							<goal>check</goal>
 						</goals>
 					</execution>
