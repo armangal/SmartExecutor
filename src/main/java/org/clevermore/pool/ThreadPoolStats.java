@@ -183,11 +183,9 @@ public class ThreadPoolStats
                 } else {
                     poolStatsData = new PoolStatsData();
                     taskStatsMap.put(taskName, poolStatsData);
+                    knowsTasks.add(taskName);
                 }
             }
-        }
-        if (!knowsTasks.contains(taskName)) {
-            knowsTasks.add(taskName);
         }
         return poolStatsData;
     }
