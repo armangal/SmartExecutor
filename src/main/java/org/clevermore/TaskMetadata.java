@@ -31,6 +31,14 @@ public class TaskMetadata {
      */
     private String taskId;
 
+    /**
+     * if to record invoking thread stack trace, it has performance affect
+     */
+    private boolean recordStackTrace = false;
+
+    /**
+     * the recorded stack trace of the invoking thread.
+     */
     private StackTraceElement[] stack;
 
     /**
@@ -40,11 +48,12 @@ public class TaskMetadata {
      * @param threadNameSuffix
      * @param taskId
      */
-    private TaskMetadata(IPoolName poolName, String threadNameSuffix, String taskId) {
+    private TaskMetadata(IPoolName poolName, String threadNameSuffix, String taskId, boolean recordStackTrace) {
         super();
         this.poolName = poolName;
         this.threadNameSuffix = threadNameSuffix;
         this.taskId = taskId;
+        this.recordStackTrace = recordStackTrace;
     }
 
     /**
@@ -53,10 +62,11 @@ public class TaskMetadata {
      * @param poolName
      * @param threadNameSuffix
      */
-    private TaskMetadata(IPoolName poolName, String threadNameSuffix) {
+    private TaskMetadata(IPoolName poolName, String threadNameSuffix, boolean recordStackTrace) {
         super();
         this.poolName = poolName;
         this.threadNameSuffix = threadNameSuffix;
+        this.recordStackTrace = recordStackTrace;
     }
 
     /**
@@ -74,6 +84,17 @@ public class TaskMetadata {
     private TaskMetadata(IPoolName poolName) {
         super();
         this.poolName = poolName;
+    }
+
+    /**
+     * keep it private, static factory methods are available.
+     * 
+     * @param poolName
+     */
+    private TaskMetadata(IPoolName poolName, final boolean recordStackTrace) {
+        super();
+        this.poolName = poolName;
+        this.recordStackTrace = recordStackTrace;
     }
 
     /**
@@ -155,7 +176,14 @@ public class TaskMetadata {
     /**
      * @param stack - sets the original stack trace of where the task was executed from
      */
-    public void setStack(StackTraceElement[] stack) {
+    public void setStack() {
+        if (!recordStackTrace) {
+            return;
+        }
+        if (this.stack != null) {
+            System.err.println(new Throwable());
+        }
+        StackTraceElement[] stack = new Throwable().getStackTrace();
         this.stack = Arrays.copyOf(stack, stack.length);
     }
 
@@ -209,11 +237,32 @@ public class TaskMetadata {
     /**
      * Factory method
      * 
+     * @param poolName - destination thread pool
+     * @return new {@link TaskMetadata} with provided pool name
+     */
+    public static TaskMetadata newMetadata(final IPoolName poolName, final boolean recordStackTrace) {
+        return new TaskMetadata(poolName);
+    }
+
+    /**
+     * Factory method
+     * 
      * @param threadNameSuffix - thread name suffix to be used during task execution
      * @return new {@link TaskMetadata} with a provided thread name suffix
      */
-    public static TaskMetadata newMetadata(String threadNameSuffix) {
-        return new TaskMetadata(null, threadNameSuffix);
+    public static TaskMetadata newMetadata(final String threadNameSuffix) {
+        return new TaskMetadata(null, threadNameSuffix, false);
+    }
+
+    /**
+     * Factory method
+     * 
+     * @param threadNameSuffix - thread name suffix to be used during task execution
+     * @param recordStackTrace - if to record the caller stacktrace
+     * @return new {@link TaskMetadata} with a provided thread name suffix
+     */
+    public static TaskMetadata newMetadata(final String threadNameSuffix, final boolean recordStackTrace) {
+        return new TaskMetadata(null, threadNameSuffix, recordStackTrace);
     }
 
     /**
@@ -223,8 +272,33 @@ public class TaskMetadata {
      * @param threadNameSuffix - thread name suffix to be used during task execution
      * @return new {@link TaskMetadata} with a provided pool name and thread name suffix
      */
-    public static TaskMetadata newMetadata(IPoolName poolName, String threadNameSuffix) {
-        return new TaskMetadata(poolName, threadNameSuffix);
+    public static TaskMetadata newMetadata(final IPoolName poolName, final String threadNameSuffix) {
+        return new TaskMetadata(poolName, threadNameSuffix, false);
+    }
+
+    /**
+     * Factory method
+     * 
+     * @param poolName- destination thread pool
+     * @param threadNameSuffix - thread name suffix to be used during task execution
+     * @param recordStackTrace - if to record the caller stacktrace
+     * @return new {@link TaskMetadata} with a provided pool name and thread name suffix
+     */
+    public static TaskMetadata newMetadata(final IPoolName poolName, final String threadNameSuffix, final boolean recordStackTrace) {
+        return new TaskMetadata(poolName, threadNameSuffix, recordStackTrace);
+    }
+
+    /**
+     * Factory method
+     * 
+     * @param poolName- destination thread pool
+     * @param threadNameSuffix - thread name suffix to be used during task execution
+     * @param taskId - id of the task to collect statistics for
+     * @param recordStackTrace - if to record the caller stacktrace
+     * @return new {@link TaskMetadata} with a provided pool name, thread name suffix and task ID.
+     */
+    public static TaskMetadata newMetadata(final IPoolName poolName, final String threadNameSuffix, final String taskId, final boolean recordStackTrace) {
+        return new TaskMetadata(poolName, threadNameSuffix, taskId, recordStackTrace);
     }
 
     /**
@@ -235,8 +309,7 @@ public class TaskMetadata {
      * @param taskId - id of the task to collect statistics for
      * @return new {@link TaskMetadata} with a provided pool name, thread name suffix and task ID.
      */
-    public static TaskMetadata newMetadata(IPoolName poolName, String threadNameSuffix, String taskId) {
-        return new TaskMetadata(poolName, threadNameSuffix, taskId);
+    public static TaskMetadata newMetadata(final IPoolName poolName, final String threadNameSuffix, final String taskId) {
+        return new TaskMetadata(poolName, threadNameSuffix, taskId, false);
     }
-
 }

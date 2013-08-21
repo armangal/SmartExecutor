@@ -43,7 +43,7 @@ final class ThreadPoolHelper {
         Collection<SmartCallable<T>> smartTasks = new HashSet<SmartCallable<T>>(tasks.size());
         for (Callable<T> c : tasks) {
             TaskMetadata taskMetadata = TaskMetadata.newDefaultMetadata();
-            taskMetadata.setStack(new Throwable().getStackTrace());
+            taskMetadata.setStack();
             Utils.fillMetaData(taskMetadata, c);
 
             smartTasks.add(wrapCallable(c, taskMetadata, poolStats));

@@ -247,7 +247,7 @@ public class ThreadPoolStats
 
         TaskExecutionStats tes = new TaskExecutionStats(lastStartTime, getCurrentTime(), taskExecutionChunk, taskStats);
         chunksCounter++;
-        if (logStats > 0 && chunksCounter % logStats == 0) {
+        if (logStats >= 0 && (logStats == 0 || chunksCounter % logStats == 0)) {
             logger.info("ThreadPoolStats for pool:{}, {}", poolName, this);
             chunksCounter = 0;
         }

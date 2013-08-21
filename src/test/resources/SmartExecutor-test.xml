@@ -32,9 +32,9 @@
 			<pool>
 				<poolName>Fast</poolName>
 				<poolNameShort>FST</poolNameShort>
-				<corePollSize>2</corePollSize>
-				<maxPoolSize>2</maxPoolSize>
-				<queueSize>100</queueSize>
+				<corePollSize>4</corePollSize>
+				<maxPoolSize>4</maxPoolSize>
+				<queueSize>1000000</queueSize>
 				<keepAliveTime>1000</keepAliveTime>
 				<poolType>regular</poolType>
 				<chunks>50</chunks>

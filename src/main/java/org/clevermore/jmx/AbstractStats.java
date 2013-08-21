@@ -24,24 +24,42 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractStats {
 
     private Logger logger;
+    private ObjectName objectName;
 
     /**
      * Registers the MBean or MXBean in MBean server.
      * 
      * @throws RuntimeException
-     * @param beanName - the name with MBean is registered in MBeanServer
+     * @param beanName - the objectName with MBean is registered in MBeanServer
      */
     public AbstractStats(final String beanName) {
         logger = LoggerFactory.getLogger(getClass().getSimpleName());
 
         MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
         try {
-            mbs.registerMBean(this, new ObjectName(beanName));
+            objectName = new ObjectName(beanName);
+            mbs.registerMBean(this, objectName);
             logger.info("Registered JMX bean:{}", beanName);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             throw new RuntimeException(beanName + " can't be initialized", e);
         }
+    }
+
+    /**
+     * in case the pool is closed all smart executor is shot down, we have to unregister JMX beans
+     * 
+     * @param beanName
+     */
+    public void unregisterBean() {
+        MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+        try {
+            mbs.unregisterMBean(objectName);
+            logger.info("UNregistered JMX bean:{}", objectName);
+        } catch (Exception e) {
+            logger.warn(e.getMessage());
+        }
+
     }
 
 }

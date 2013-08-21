@@ -8,6 +8,12 @@ package org.clevermore.pool;
 
 import java.util.concurrent.atomic.AtomicLong;
 
+/**
+ * A data holder for active pool stats. Used in 3 cases: 1. to hold global pool stats; 2. to hold current
+ * chunk pool stats; 3. to hold current chunk stats for a given task name
+ * 
+ * @author armang
+ */
 public class PoolStatsData {
 
     private final AtomicLong submitted = new AtomicLong(0);

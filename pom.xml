@@ -4,7 +4,7 @@
 
 	<groupId>org.clevermore</groupId>
 	<artifactId>smartexecutor</artifactId>
-	<version>1.0.8</version>
+	<version>1.0.9</version>
 	<packaging>jar</packaging>
 	<name>smartexecutor</name>
 	<description>SmartExecutor is a light-weight thread execution framework. The goal of the framework is to provide easy controllable thread executions with decent build-in monitoring capabilities.</description>

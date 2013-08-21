@@ -14,24 +14,37 @@ import java.util.concurrent.TimeUnit;
 
 import org.clevermore.TaskMetadata;
 import org.clevermore.configuration.PoolConfiguration;
+import org.clevermore.jmx.PoolStats;
 import org.clevermore.pool.ISmartScheduledThreadPool;
 import org.clevermore.pool.ThreadPoolStats;
 import org.clevermore.utils.Utils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SmartScheduledThreadPool
     extends ScheduledThreadPoolExecutor
     implements ISmartScheduledThreadPool {
 
+    private static Logger logger = LoggerFactory.getLogger("SmartScheduledThreadPool");
+
     protected final ThreadPoolStats poolStats;
 
     protected final PoolConfiguration poolConf;
 
-    public SmartScheduledThreadPool(final PoolConfiguration poolConf) {
+    private PoolStats poolStatsJmx;
+
+    public SmartScheduledThreadPool(final PoolConfiguration poolConf, final String smartExecutorName) {
         super(poolConf.getCorePollSize(), ThreadPoolHelper.getThreadFactory(poolConf));
 
         this.poolConf = poolConf;
         this.poolStats = new ThreadPoolStats(poolConf.getChunks(), poolConf.getChunkInterval(), poolConf.getLogStats(), poolConf.getPoolName());
 
+        try {
+            poolStatsJmx = new PoolStats(smartExecutorName, this);
+            logger.info("Registered JMX bean for smart pool:{}", poolStatsJmx.getName());
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        }
     }
 
     @Override
@@ -40,7 +53,7 @@ public class SmartScheduledThreadPool
     @Override
     public ScheduledFuture<?> schedule(Runnable command, long delay, TimeUnit unit) {
         TaskMetadata taskMetadata = TaskMetadata.newDefaultMetadata();
-        taskMetadata.setStack(new Throwable().getStackTrace());
+        taskMetadata.setStack();
         Utils.fillMetaData(taskMetadata, command);
 
         return schedule(command, delay, unit, taskMetadata);
@@ -60,7 +73,7 @@ public class SmartScheduledThreadPool
     @Override
     public <V> ScheduledFuture<V> schedule(Callable<V> callable, long delay, TimeUnit unit) {
         TaskMetadata taskMetadata = TaskMetadata.newDefaultMetadata();
-        taskMetadata.setStack(new Throwable().getStackTrace());
+        taskMetadata.setStack();
         Utils.fillMetaData(taskMetadata, callable);
 
         return schedule(callable, delay, unit, taskMetadata);
@@ -80,7 +93,7 @@ public class SmartScheduledThreadPool
     @Override
     public ScheduledFuture<?> scheduleAtFixedRate(Runnable command, long initialDelay, long period, TimeUnit unit) {
         TaskMetadata taskMetadata = TaskMetadata.newDefaultMetadata();
-        taskMetadata.setStack(new Throwable().getStackTrace());
+        taskMetadata.setStack();
         Utils.fillMetaData(taskMetadata, command);
 
         return scheduleAtFixedRate(command, initialDelay, period, unit, taskMetadata);
@@ -101,7 +114,7 @@ public class SmartScheduledThreadPool
     @Override
     public ScheduledFuture<?> scheduleWithFixedDelay(Runnable command, long initialDelay, long delay, TimeUnit unit) {
         TaskMetadata taskMetadata = TaskMetadata.newDefaultMetadata();
-        taskMetadata.setStack(new Throwable().getStackTrace());
+        taskMetadata.setStack();
         Utils.fillMetaData(taskMetadata, command);
 
         return scheduleWithFixedDelay(command, initialDelay, delay, unit, taskMetadata);
@@ -134,4 +147,10 @@ public class SmartScheduledThreadPool
         return poolConf;
     }
 
+    @Override
+    public void shutdown() {
+        super.shutdown();
+        poolStats.shutdown();
+        poolStatsJmx.unregisterBean();
+    }
 }

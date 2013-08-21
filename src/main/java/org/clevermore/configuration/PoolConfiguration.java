@@ -63,13 +63,13 @@ public class PoolConfiguration {
     /**
      * how often to "cut" a chunk
      */
-    private long chunkInterval = 10000;
+    private long chunkInterval = 20000;
 
     /**
      * how often to print chunk stats to log, -1 means never any other positive number means that each X chunk
      * iteration the stats will be printed
      */
-    private int logStats = 1; // default each chunk will be printed
+    private int logStats = 0; // default each chunk will be printed
 
     PoolConfiguration() {}
 

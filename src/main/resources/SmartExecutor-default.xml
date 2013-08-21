@@ -2,39 +2,69 @@
 <SmartExecutor xmlns:ns2="http://www.armangal.com/smartexecutor/v1">
 
 	<executor>
-		<name>Default Executor</name>
-		<description>Default Executor used in the system</description>
+		<!--a short name to the smart executor instance, DE = "Default Executor" -->
+		<name>DE</name>
+		<!-- description of the smart executor, visible via JMX -->
+		<description><![CDATA[Default Executor used in the system]]></description>
+
+		<!-- list the available thread pools -->
 		<pools>
 			<pool>
+				<!--Give a unique name to the thread pool -->
 				<poolName>Default</poolName>
+
+				<!--Give a unique short name to the thread pool that will be used as thread name suffix -->
 				<poolNameShort>DTP</poolNameShort>
-				<description>Detailed description, deafult thread pool</description>
+
+				<!--DEtailed description of the pool purpose, will be visible via JMX and monitoring system -->
+				<description><![CDATA[Detailed description, deafult thread pool]]></description>
+
+				<!-- the number of threads to keep in the pool, even if they are idle. -->
 				<corePollSize>2</corePollSize>
+
+				<!-- the maximum number of threads to allow in the pool. -->
 				<maxPoolSize>3</maxPoolSize>
+
+				<!-- size of the queue that is used for holding tasks before they are executed. -->
 				<queueSize>100</queueSize>
+
+				<!-- when the number of threads is greater than the core, this is the maximum time that excess idle threads will wait for new tasks before 
+					terminating. -->
 				<keepAliveTime>1000</keepAliveTime>
+
+				<!-- The type of the pool, available types are (regular/scheduled/cached) -->
 				<poolType>regular</poolType>
+
+				<!-- number of statistical chunks to hold in memory, so the monitoring system, once connected, can retrieve some historical data -->
 				<chunks>100</chunks>
+
+				<!-- each XXX milliseconds "cut" a statistical chunk -->
 				<chunkInterval>10000</chunkInterval>
+
+				<!-- define how often to log the chunks, negative value = never, 0 = each time chunk is cut, other positive value means each X times chunk 
+					is cut -->
+				<logStats>0</logStats>
 			</pool>
 
 			<pool>
 				<poolName>Scheduled</poolName>
 				<poolNameShort>STP</poolNameShort>
-				<description>Detailed description, Scheduled thread pool</description>
+				<description><![CDATA[Detailed description, Scheduled thread pool]]></description>
 				<corePollSize>5</corePollSize>
 				<poolType>scheduled</poolType>
 				<chunks>100</chunks>
 				<chunkInterval>10000</chunkInterval>
+				<logStats>0</logStats>
 			</pool>
 
 			<pool>
 				<poolName>Cached</poolName>
 				<poolNameShort>CTP</poolNameShort>
-				<description>Detailed description, Cached thread pool</description>
+				<description><![CDATA[Detailed description, Cached thread pool]]></description>
 				<poolType>cached</poolType>
 				<chunks>100</chunks>
 				<chunkInterval>10000</chunkInterval>
+				<logStats>0</logStats>
 			</pool>
 		</pools>
 	</executor>

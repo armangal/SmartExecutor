@@ -13,6 +13,7 @@ import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
@@ -47,6 +48,8 @@ public abstract class AbstractJmxStatDataHolder<T extends AbstractJmxStatEntry> 
 
     private long previousCPUTime;
 
+    private ScheduledFuture<?> cuhnkerFuture;
+
     /**
      * simple constructor in case you want to keep one day of stats and chunk every minute.
      * 
@@ -66,7 +69,10 @@ public abstract class AbstractJmxStatDataHolder<T extends AbstractJmxStatEntry> 
 
         this.lastStartTime = getCurrentTime();
         this.maxStatEntriesInMemory = maxStatEntriesInMemory;
-        Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(new StatChunker(statsName), getInitialDelay(), statEntryPeriod, TimeUnit.MILLISECONDS);
+        cuhnkerFuture = Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(new StatChunker(statsName),
+                                                                                         getInitialDelay(),
+                                                                                         statEntryPeriod,
+                                                                                         TimeUnit.MILLISECONDS);
     }
 
     /**
@@ -213,6 +219,10 @@ public abstract class AbstractJmxStatDataHolder<T extends AbstractJmxStatEntry> 
                 Thread.currentThread().setName(name);
             }
         }
+    }
+
+    public void shutdown() {
+        cuhnkerFuture.cancel(true);
     }
 
 }

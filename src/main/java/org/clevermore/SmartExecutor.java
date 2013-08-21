@@ -26,9 +26,6 @@ import javax.xml.bind.JAXBException;
 import org.clevermore.configuration.Config;
 import org.clevermore.configuration.PoolConfiguration;
 import org.clevermore.jmx.ExecutorStats;
-import org.clevermore.jmx.ExecutorStatsMXBean;
-import org.clevermore.jmx.PoolStats;
-import org.clevermore.jmx.PoolStatsMXBean;
 import org.clevermore.pool.IGeneralThreadPool;
 import org.clevermore.pool.ISmartScheduledThreadPool;
 import org.clevermore.pool.ISmartThreadPool;
@@ -50,6 +47,8 @@ public class SmartExecutor {
     private ConcurrentHashMap<String, IGeneralThreadPool> threadPoolMap = new ConcurrentHashMap<String, IGeneralThreadPool>(0);
 
     private Config config;
+
+    private ExecutorStats executorStats;
 
     /**
      * Initializing SmartExecutor with default pools configurations.
@@ -91,9 +90,8 @@ public class SmartExecutor {
             logger.info("Configurations have been validated.");
 
             try {
-                ExecutorStatsMXBean esBean = new ExecutorStats(this, config.getExecutorConfiguration().getName(), config.getExecutorConfiguration()
-                                                                                                                        .getDescription());
-                logger.info("Registered JMX bean for smart executor:{}", esBean.getName());
+                executorStats = new ExecutorStats(this, config.getExecutorConfiguration().getName(), config.getExecutorConfiguration().getDescription());
+                logger.info("Registered JMX bean for smart executor:{}", executorStats.getName());
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
             }
@@ -124,7 +122,7 @@ public class SmartExecutor {
      * @param taskMetadata
      */
     public void execute(Runnable command, TaskMetadata taskMetadata) {
-        taskMetadata.setStack(new Throwable().getStackTrace());
+        taskMetadata.setStack();
         Utils.fillMetaData(taskMetadata, command);
         ISmartThreadPool smartThreadPool = (ISmartThreadPool) getPool(taskMetadata.getPoolNameAsString());
         smartThreadPool.execute(command, taskMetadata);
@@ -137,7 +135,7 @@ public class SmartExecutor {
     }
 
     public <T> Future<T> submit(Callable<T> task, TaskMetadata taskMetadata) {
-        taskMetadata.setStack(new Throwable().getStackTrace());
+        taskMetadata.setStack();
         Utils.fillMetaData(taskMetadata, task);
         ISmartThreadPool smartThreadPool = (ISmartThreadPool) getPool(taskMetadata.getPoolNameAsString());
         return smartThreadPool.submit(task, taskMetadata);
@@ -150,7 +148,7 @@ public class SmartExecutor {
     }
 
     public ScheduledFuture<?> schedule(Runnable command, long delay, TimeUnit unit, TaskMetadata taskMetadata) {
-        taskMetadata.setStack(new Throwable().getStackTrace());
+        taskMetadata.setStack();
         Utils.fillMetaData(taskMetadata, command);
         ISmartScheduledThreadPool scheduledPool = getScheduledPool(taskMetadata.getPoolNameAsString());
         return scheduledPool.schedule(command, delay, unit, taskMetadata);
@@ -163,7 +161,7 @@ public class SmartExecutor {
     }
 
     public <V> ScheduledFuture<V> schedule(Callable<V> callable, long delay, TimeUnit unit, TaskMetadata taskMetadata) {
-        taskMetadata.setStack(new Throwable().getStackTrace());
+        taskMetadata.setStack();
         Utils.fillMetaData(taskMetadata, callable);
         ISmartScheduledThreadPool scheduledPool = getScheduledPool(taskMetadata.getPoolNameAsString());
         return scheduledPool.schedule(callable, delay, unit, taskMetadata);
@@ -176,7 +174,7 @@ public class SmartExecutor {
     }
 
     public ScheduledFuture<?> scheduleAtFixedRate(Runnable command, long initialDelay, long period, TimeUnit unit, TaskMetadata taskMetadata) {
-        taskMetadata.setStack(new Throwable().getStackTrace());
+        taskMetadata.setStack();
         Utils.fillMetaData(taskMetadata, command);
         ISmartScheduledThreadPool scheduledPool = getScheduledPool(taskMetadata.getPoolNameAsString());
         return scheduledPool.scheduleAtFixedRate(command, initialDelay, period, unit, taskMetadata);
@@ -189,18 +187,19 @@ public class SmartExecutor {
     }
 
     public ScheduledFuture<?> scheduleWithFixedDelay(Runnable command, long initialDelay, long delay, TimeUnit unit, TaskMetadata taskMetadata) {
-        taskMetadata.setStack(new Throwable().getStackTrace());
+        taskMetadata.setStack();
         Utils.fillMetaData(taskMetadata, command);
         ISmartScheduledThreadPool scheduledPool = getScheduledPool(taskMetadata.getPoolNameAsString());
         return scheduledPool.scheduleWithFixedDelay(command, initialDelay, delay, unit, taskMetadata);
     }
 
     public void shutdown() {
-        for (ExecutorService smartThreadPool : threadPoolMap.values()) {
-            logger.info("Shoting down pool:{}", smartThreadPool);
+        logger.info("Shutting down smart executor:{}", config.getExecutorConfiguration().getName());
+        for (IGeneralThreadPool smartThreadPool : threadPoolMap.values()) {
+            logger.info("Shoting down pool:{}", smartThreadPool.getPoolConfiguration().getPoolName());
             smartThreadPool.shutdown();
         }
-
+        executorStats.unregisterBean();
     }
 
     private ISmartScheduledThreadPool getScheduledPool(String poolName) {
@@ -233,14 +232,6 @@ public class SmartExecutor {
                 } else {
                     IGeneralThreadPool threadPool = initThreadPool(poolName);
                     threadPoolMap.put(poolName, threadPool);
-
-                    try {
-                        PoolStatsMXBean poolStatsMXBean = new PoolStats(config.getExecutorConfiguration().getName(), threadPool);
-                        logger.info("Registered JMX bean for smart pool:{}", poolStatsMXBean.getName());
-                    } catch (Exception e) {
-                        logger.error(e.getMessage(), e);
-                    }
-
                     return threadPool;
                 }
             }
@@ -253,9 +244,9 @@ public class SmartExecutor {
             switch (poolConfiguration.getPoolType()) {
                 case regular:
                 case cached:
-                    return new SmartThreadPool(poolConfiguration);
+                    return new SmartThreadPool(poolConfiguration, config.getExecutorConfiguration().getName());
                 case scheduled:
-                    return new SmartScheduledThreadPool(poolConfiguration);
+                    return new SmartScheduledThreadPool(poolConfiguration, config.getExecutorConfiguration().getName());
             }
         }
         throw new RuntimeException("Configaration for pool:" + poolName + " were not found.");

@@ -18,22 +18,14 @@ public class Utils {
 
     private static final String EMPTY_STRING = "";
 
-/*    static TaskMetadata newDefaultMetadata(Object task) {
-        return fillMetaData(TaskMetadata.newDefaultMetadata(), task);
-    }
-
-    static TaskMetadata newMetadata(IPoolName poolName, Object task) {
-        return fillMetaData(TaskMetadata.newMetadata(poolName), task);
-    }
-
-    static TaskMetadata newMetadata(IPoolName poolName, String threadNameSuffix, Object task) {
-        return fillMetaData(TaskMetadata.newMetadata(poolName, threadNameSuffix), task);
-    }
-
-    static TaskMetadata newMetadata(IPoolName poolName, String threadNameSuffix, String taskId, Object task) {
-        return fillMetaData(TaskMetadata.newMetadata(poolName, threadNameSuffix, taskId), task);
-    }
-*/
+    /**
+     * Tries to complete that metadata with parameters coming from annotations or interfaces implemented by
+     * the task
+     * 
+     * @param taskMetadata
+     * @param task
+     * @return
+     */
     public static TaskMetadata fillMetaData(TaskMetadata taskMetadata, Object task) {
         if (!taskMetadata.hasPoolName()) {
             taskMetadata.setPoolName(getPoolName(task));

@@ -21,19 +21,26 @@ import java.util.concurrent.TimeoutException;
 import org.clevermore.TaskMetadata;
 import org.clevermore.configuration.PoolConfiguration;
 import org.clevermore.configuration.PoolType;
+import org.clevermore.jmx.PoolStats;
 import org.clevermore.pool.ISmartThreadPool;
 import org.clevermore.pool.ThreadPoolStats;
 import org.clevermore.utils.Utils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SmartThreadPool
     extends ThreadPoolExecutor
     implements ISmartThreadPool {
 
+    private static Logger logger = LoggerFactory.getLogger("SmartThreadPool");
+
     protected final ThreadPoolStats poolStats;
 
     protected final PoolConfiguration poolConf;
 
-    public SmartThreadPool(final PoolConfiguration poolConf) {
+    private PoolStats poolStatsJmx;
+
+    public SmartThreadPool(final PoolConfiguration poolConf, final String smartExecutorName) {
         super((poolConf.getPoolType().equals(PoolType.regular) ? poolConf.getCorePollSize() : 0),
               (poolConf.getPoolType().equals(PoolType.regular) ? poolConf.getMaxPoolSize() : Integer.MAX_VALUE),
               poolConf.getKeepAliveTime(),
@@ -44,12 +51,19 @@ public class SmartThreadPool
         this.poolConf = poolConf;
         this.poolStats = new ThreadPoolStats(poolConf.getChunks(), poolConf.getChunkInterval(), poolConf.getLogStats(), poolConf.getPoolName());
 
+        try {
+            poolStatsJmx = new PoolStats(smartExecutorName, this);
+            logger.info("Registered JMX bean for smart pool:{}", poolStatsJmx.getName());
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        }
+
     }
 
     @Override
     public void execute(Runnable command) {
         TaskMetadata taskMetadata = TaskMetadata.newDefaultMetadata();
-        taskMetadata.setStack(new Throwable().getStackTrace());
+        taskMetadata.setStack();
         Utils.fillMetaData(taskMetadata, command);
 
         execute(command, taskMetadata);
@@ -69,7 +83,7 @@ public class SmartThreadPool
     @Override
     public <T> Future<T> submit(Callable<T> task) {
         TaskMetadata taskMetadata = TaskMetadata.newDefaultMetadata();
-        taskMetadata.setStack(new Throwable().getStackTrace());
+        taskMetadata.setStack();
         Utils.fillMetaData(taskMetadata, task);
         return submit(task, taskMetadata);
     }
@@ -88,7 +102,7 @@ public class SmartThreadPool
     @Override
     public Future<?> submit(Runnable task) {
         TaskMetadata taskMetadata = TaskMetadata.newDefaultMetadata();
-        taskMetadata.setStack(new Throwable().getStackTrace());
+        taskMetadata.setStack();
         Utils.fillMetaData(taskMetadata, task);
 
         return submit(task, taskMetadata);
@@ -108,7 +122,7 @@ public class SmartThreadPool
     @Override
     public <T> Future<T> submit(Runnable task, T result) {
         TaskMetadata taskMetadata = TaskMetadata.newDefaultMetadata();
-        taskMetadata.setStack(new Throwable().getStackTrace());
+        taskMetadata.setStack();
         Utils.fillMetaData(taskMetadata, task);
 
         return submit(task, result, taskMetadata);
@@ -190,5 +204,12 @@ public class SmartThreadPool
     @Override
     public String toString() {
         return "SmartThreadPool Pool:[" + super.toString() + "]\nStats:[" + poolStats + "]\nConf:[" + poolConf + "]";
+    }
+
+    @Override
+    public void shutdown() {
+        super.shutdown();
+        poolStats.shutdown();
+        poolStatsJmx.unregisterBean();
     }
 }
