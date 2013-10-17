@@ -47,7 +47,7 @@ public class ConfigLoader {
         return configXML;
     }
 
-    private InputStream getResource(String configXMLresource) {
+    public static InputStream getResource(Class<?> currentClass, String configXMLresource) {
         Thread.currentThread().getContextClassLoader();
         ClassLoader systemClassLoader = ClassLoader.getSystemClassLoader();
         InputStream configXML = null;
@@ -58,7 +58,7 @@ public class ConfigLoader {
             }
 
             logger.info("Config file wasn't found by systemClassLoader");
-            ClassLoader contextClassLoader = getClass().getClassLoader();
+            ClassLoader contextClassLoader = currentClass.getClassLoader();
             do {
                 resource = contextClassLoader.getResource(configXMLresource);
                 if (resource == null) {
@@ -97,7 +97,8 @@ public class ConfigLoader {
 
     /**
      * @param configXMLresource = can be any file name under current classLoader or full file name path or
-     *            full resource name of XML file that is packed inside some JAR: <b>com/example/work/config.xml</b>
+     *            full resource name of XML file that is packed inside some JAR:
+     *            <b>com/example/work/config.xml</b>
      * @return
      */
     public InputStream loadConfig(String configXMLresource) {
@@ -114,7 +115,7 @@ public class ConfigLoader {
 
         InputStream configXML = getResourceAsStream(configXMLresource);
         if (configXML == null) {
-            configXML = getResource(configXMLresource);
+            configXML = getResource(getClass(), configXMLresource);
             if (configXML == null) {
                 configXML = getFromFile(configXMLresource);
             }
